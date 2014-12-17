@@ -11,7 +11,7 @@ public class World {
     private Letter activeLetter;
     private List<Letter> correctLetters;
     private List<Letter> incorrectLetters;
-    private List<Letter> keyLetters;
+    private List<KeyLetter> keyLetters;
 
     public Letter getActiveLetter() {
         return activeLetter;
@@ -21,11 +21,11 @@ public class World {
         this.activeLetter = activeLetter;
     }
 
-    public List<Letter> getKeyLetters() {
+    public List<KeyLetter> getKeyLetters() {
         return keyLetters;
     }
 
-    public void setKeyLetters(List<Letter> keyLetters) {
+    public void setKeyLetters(List<KeyLetter> keyLetters) {
         this.keyLetters = keyLetters;
     }
 

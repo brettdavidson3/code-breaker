@@ -1,13 +1,18 @@
 package com.lateralus.codebreaker.controller;
 
+import com.lateralus.codebreaker.model.KeyLetter;
 import com.lateralus.codebreaker.model.Letter;
 import com.lateralus.codebreaker.model.World;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.lateralus.codebreaker.controller.helper.RandomUtils.getNextValue;
 import static com.lateralus.codebreaker.controller.helper.RandomUtils.randomInt;
+
+import com.lateralus.codebreaker.model.LetterEnum;
 import static com.lateralus.codebreaker.model.World.KEY_LETTER_ROW;
-import static com.lateralus.codebreaker.model.World.LETTER_COLUMN_COUNT;
 
 public class LetterController implements CodeController {
 
@@ -17,16 +22,24 @@ public class LetterController implements CodeController {
 
     @Override
     public void initialize(World world) {
+        initializeKeyLetters(world);
         initializeActiveLetter(world);
-
-        ArrayList<Letter> keyLetters = new ArrayList<>();
-        for (int i = 0; i < LETTER_COLUMN_COUNT; i++) {
-            keyLetters.add(new Letter(i, KEY_LETTER_ROW));
-        }
-        world.setKeyLetters(keyLetters);
-
         world.setCorrectLetters(new ArrayList<>());
         world.setIncorrectLetters(new ArrayList<>());
+    }
+
+    private void initializeKeyLetters(World world) {
+        ArrayList<KeyLetter> keyLetters = new ArrayList<>();
+
+        LetterEnum[] values = LetterEnum.values();
+        List<LetterEnum> availableValues = LetterEnum.allLetters();
+        List<LetterEnum> availableMappedLetters = LetterEnum.allLetters();
+        for (int i = 0; i < values.length; i++) {
+            KeyLetter newLetter = new KeyLetter(i, KEY_LETTER_ROW, availableValues, availableMappedLetters);
+            keyLetters.add(newLetter);
+        }
+
+        world.setKeyLetters(keyLetters);
     }
 
     @Override
@@ -68,7 +81,11 @@ public class LetterController implements CodeController {
     }
 
     private void initializeActiveLetter(World world) {
-        world.setActiveLetter(new Letter(randomInt(12), 19));
+        List<LetterEnum> availableLetters = world.getKeyLetters().stream()
+                .filter(KeyLetter::isNotSolved)
+                .map(KeyLetter::getMappedLetter)
+                .collect(Collectors.toList());
+        world.setActiveLetter(new Letter(randomInt(12), 19, getNextValue(availableLetters)));
     }
 
     private void onActiveLetterHit(World world) {
