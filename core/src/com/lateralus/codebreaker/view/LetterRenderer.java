@@ -5,21 +5,20 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.lateralus.codebreaker.model.Letter;
+import com.lateralus.codebreaker.model.PositionLetter;
+import com.lateralus.codebreaker.model.KeyLetter;
 import com.lateralus.codebreaker.model.World;
 
 import java.util.function.Predicate;
 
-import static com.lateralus.codebreaker.model.World.KEY_LETTER_ROW;
-import static com.lateralus.codebreaker.model.World.LETTER_COLUMN_COUNT;
-import static com.lateralus.codebreaker.model.World.LETTER_ROW_COUNT;
+import static com.lateralus.codebreaker.model.World.*;
 
 public class LetterRenderer implements CodeRenderer {
 
     private static final int LETTER_SIZE = 90;
 
     private Sprite[][] sprites;
-    private Letter[][] randomLetters;
+    private PositionLetter[][] randomLetters;
     private TextureRegion[] blueTextures;
     private TextureRegion[] greenTextures;
     private TextureRegion[] grayTextures;
@@ -37,27 +36,39 @@ public class LetterRenderer implements CodeRenderer {
 
     @Override
     public void render(SpriteBatch spriteBatch, World world, float delta) {
+        cycleRandomNumbers(delta);
+        resetSprites();
+        applySprites(world);
+        drawSprites(spriteBatch);
+    }
+
+    private void cycleRandomNumbers(float delta) {
         timeSinceLastRandomLetters += delta;
         if (timeSinceLastRandomLetters >= 0.1f) { // 100 ms
             randomizeBackgroundLetters();
             timeSinceLastRandomLetters = 0f;
         }
+    }
 
+    private void resetSprites() {
         for (int col = 0; col < getSpriteGridColumnCount(); col++) {
             for (int row = 0; row < getSpriteGridRowCount(); row++) {
                 Sprite currentSprite = sprites[col][row];
-                if (isActiveSprite(world, col, row)) {
-                    updateActiveSprite(world, currentSprite);
-                } else if (isKeySprite(row)) {
-                    updateKeySprite(world, currentSprite, col);
-                } else if (isIncorrectSprite(world, col, row)) {
-                    updateIncorrectSprite(currentSprite);
-                } else if (isCorrectSprite(world, col, row)) {
+                updateBackgroundSprite(currentSprite, col, row);
+            }
+        }
+    }
 
-                } else {
-                    updateBackgroundSprite(currentSprite, col, row);
-                }
-                currentSprite.draw(spriteBatch);
+    private void applySprites(World world) {
+        updateActiveSprite(world);
+        updateKeySprites(world);
+        updateIncorrectSprites(world);
+    }
+
+    private void drawSprites(SpriteBatch spriteBatch) {
+        for (Sprite[] spriteColumn : sprites) {
+            for (Sprite sprite : spriteColumn) {
+                sprite.draw(spriteBatch);
             }
         }
     }
@@ -106,14 +117,14 @@ public class LetterRenderer implements CodeRenderer {
     }
 
     private void initializeRandomLetters() {
-        randomLetters = new Letter[getSpriteGridColumnCount()][getSpriteGridRowCount()];
+        randomLetters = new PositionLetter[getSpriteGridColumnCount()][getSpriteGridRowCount()];
         randomizeBackgroundLetters();
     }
 
     private void randomizeBackgroundLetters() {
         for (int col = 0; col < getSpriteGridColumnCount(); col++) {
             for (int row = 0; row < getSpriteGridRowCount(); row++) {
-                randomLetters[col][row] = new Letter(col, row);
+                randomLetters[col][row] = new PositionLetter(col, row);
             }
         }
     }
@@ -122,42 +133,30 @@ public class LetterRenderer implements CodeRenderer {
         return new TextureRegion(letterTexture, row * 90, col * 90, 90, 90);
     }
 
-    private boolean isActiveSprite(World world, int col, int row) {
-        return world.getActiveLetter().getRow() == row && world.getActiveLetter().getCol() == col;
-    }
-
-    private void updateActiveSprite(World world, Sprite currentSprite) {
-        currentSprite.setRegion(greenTextures[world.getActiveLetter().getValue().getIndex()]);
-    }
-
-    private boolean isKeySprite(int row) {
-        return row == KEY_LETTER_ROW;
-    }
-
-    private void updateKeySprite(World world, Sprite currentSprite, int col) {
-        currentSprite.setRegion(blueTextures[world.getKeyLetters().get(col).getValue().getIndex()]);
-    }
-
     private void updateBackgroundSprite(Sprite currentSprite, int col, int row) {
         currentSprite.setRegion(grayTextures[randomLetters[col][row].getValue().getIndex()]);
     }
 
-    private boolean isIncorrectSprite(World world, int col, int row) {
-        return world.getIncorrectLetters().stream()
-                .anyMatch(positionMatchesPredicate(col, row));
+    private void updateActiveSprite(World world) {
+        int col = world.getActiveLetter().getCol();
+        int row = world.getActiveLetter().getRow();
+        Sprite currentSprite = sprites[col][row];
+        currentSprite.setRegion(greenTextures[world.getActiveLetter().getValue().getIndex()]);
     }
 
-    private void updateIncorrectSprite(Sprite currentSprite) {
-        currentSprite.setRegion(specialTextures[0]);
+    private void updateKeySprites(World world) {
+        int row = KEY_LETTER_ROW;
+        for (int col = 0; col < LETTER_COLUMN_COUNT; col++) {
+            Sprite currentSprite = sprites[col][row];
+            KeyLetter currentKeyLetter = world.getDisplayableKeyLetters()[col];
+            currentSprite.setRegion(blueTextures[currentKeyLetter.getKeyLetter().getIndex()]);
+        }
     }
 
-    private boolean isCorrectSprite(World world, int col, int row) {
-        return world.getCorrectLetters().stream()
-                .anyMatch(positionMatchesPredicate(col, row));
-    }
-
-    private static Predicate<Letter> positionMatchesPredicate(int col, int row) {
-        return (letter) -> letter.getCol() == col && letter.getRow() == row;
+    private void updateIncorrectSprites(World world) {
+        for (PositionLetter incorrectLetter: world.getIncorrectLetters()) {
+            sprites[incorrectLetter.getCol()][incorrectLetter.getRow()].setRegion(specialTextures[0]);
+        }
     }
 
 }

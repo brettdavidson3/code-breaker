@@ -4,23 +4,32 @@ import java.util.List;
 
 import static com.lateralus.codebreaker.controller.helper.RandomUtils.getNextValue;
 
-public class KeyLetter extends Letter {
+public class KeyLetter {
 
-    private LetterEnum mappedLetter;
+    private LetterEnum keyLetter;
+    private LetterEnum valueLetter;
     private boolean isSolved;
 
-    public KeyLetter(int col, int row, List<LetterEnum> availableValues, List<LetterEnum> availableMappedLetters) {
-        super(col, row, getNextValue(availableValues));
-        this.mappedLetter = getNextValue(availableMappedLetters);
+    public KeyLetter(List<LetterEnum> availableKeys, List<LetterEnum> availableValues) {
+        this.keyLetter = getNextValue(availableKeys);
+        this.valueLetter = getNextValue(availableValues);
         isSolved = false;
     }
 
-    public LetterEnum getMappedLetter() {
-        return mappedLetter;
+    public LetterEnum getKeyLetter() {
+        return keyLetter;
     }
 
-    public void setMappedLetter(LetterEnum mappedLetter) {
-        this.mappedLetter = mappedLetter;
+    public void setKeyLetter(LetterEnum keyLetter) {
+        this.keyLetter = keyLetter;
+    }
+
+    public LetterEnum getValueLetter() {
+        return valueLetter;
+    }
+
+    public void setValueLetter(LetterEnum valueLetter) {
+        this.valueLetter = valueLetter;
     }
 
     public boolean isSolved() {
@@ -34,6 +43,5 @@ public class KeyLetter extends Letter {
     public void setSolved(boolean isSolved) {
         this.isSolved = isSolved;
     }
-
 
 }

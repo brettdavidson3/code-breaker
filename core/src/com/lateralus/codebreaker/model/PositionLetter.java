@@ -2,19 +2,19 @@ package com.lateralus.codebreaker.model;
 
 import static com.lateralus.codebreaker.controller.helper.RandomUtils.randomInt;
 
-public class Letter {
+public class PositionLetter {
 
     private int row;
     private int col;
     private LetterEnum value;
 
-    public Letter(int col, int row) {
+    public PositionLetter(int col, int row) {
         this.value = LetterEnum.fromIndex(randomInt(26));
         this.row = row;
         this.col = col;
     }
 
-    public Letter(int col, int row, LetterEnum value) {
+    public PositionLetter(int col, int row, LetterEnum value) {
         this.value = value;
         this.row = row;
         this.col = col;

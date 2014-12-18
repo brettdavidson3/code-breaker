@@ -1,7 +1,7 @@
 package com.lateralus.codebreaker.controller;
 
 import com.lateralus.codebreaker.model.KeyLetter;
-import com.lateralus.codebreaker.model.Letter;
+import com.lateralus.codebreaker.model.PositionLetter;
 import com.lateralus.codebreaker.model.World;
 
 import java.util.ArrayList;
@@ -13,6 +13,7 @@ import static com.lateralus.codebreaker.controller.helper.RandomUtils.randomInt;
 
 import com.lateralus.codebreaker.model.LetterEnum;
 import static com.lateralus.codebreaker.model.World.KEY_LETTER_ROW;
+import static com.lateralus.codebreaker.model.World.LETTER_COLUMN_COUNT;
 
 public class LetterController implements CodeController {
 
@@ -30,23 +31,28 @@ public class LetterController implements CodeController {
 
     private void initializeKeyLetters(World world) {
         ArrayList<KeyLetter> keyLetters = new ArrayList<>();
+        KeyLetter[] displayableKeyLetters = new KeyLetter[LETTER_COLUMN_COUNT];
 
         LetterEnum[] values = LetterEnum.values();
+        List<LetterEnum> availableKeys = LetterEnum.allLetters();
         List<LetterEnum> availableValues = LetterEnum.allLetters();
-        List<LetterEnum> availableMappedLetters = LetterEnum.allLetters();
         for (int i = 0; i < values.length; i++) {
-            KeyLetter newLetter = new KeyLetter(i, KEY_LETTER_ROW, availableValues, availableMappedLetters);
+            KeyLetter newLetter = new KeyLetter(availableKeys, availableValues);
             keyLetters.add(newLetter);
+            if (i < LETTER_COLUMN_COUNT) {
+                displayableKeyLetters[i] = newLetter;
+            }
         }
 
         world.setKeyLetters(keyLetters);
+        world.setDisplayableKeyLetters(displayableKeyLetters);
     }
 
     @Override
     public void update(World world, float delta) {
         timeSinceLastLetterFall += delta;
         if (timeSinceLastLetterFall >= LETTER_FALL_SPEED) {
-            Letter activeLetter = world.getActiveLetter();
+            PositionLetter activeLetter = world.getActiveLetter();
             int currentRow = activeLetter.getRow();
             if (activeLetterWillHitBottom(currentRow) || activeLetterWillHitOtherLetter(world)) {
                 onActiveLetterHit(world);
@@ -75,7 +81,7 @@ public class LetterController implements CodeController {
                 .anyMatch((letter) -> activeLetterWillHit(world, letter));
     }
 
-    private boolean activeLetterWillHit(World world, Letter letter) {
+    private boolean activeLetterWillHit(World world, PositionLetter letter) {
         return world.getActiveLetter().getCol() == letter.getCol() &&
                world.getActiveLetter().getRow() <= letter.getRow() + 1;
     }
@@ -83,9 +89,9 @@ public class LetterController implements CodeController {
     private void initializeActiveLetter(World world) {
         List<LetterEnum> availableLetters = world.getKeyLetters().stream()
                 .filter(KeyLetter::isNotSolved)
-                .map(KeyLetter::getMappedLetter)
+                .map(KeyLetter::getValueLetter)
                 .collect(Collectors.toList());
-        world.setActiveLetter(new Letter(randomInt(12), 19, getNextValue(availableLetters)));
+        world.setActiveLetter(new PositionLetter(randomInt(12), 19, getNextValue(availableLetters)));
     }
 
     private void onActiveLetterHit(World world) {
