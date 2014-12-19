@@ -7,12 +7,14 @@ public class World {
     public static final int LETTER_COLUMN_COUNT = 12;
     public static final int LETTER_ROW_COUNT = 17;
     public static final int KEY_LETTER_ROW = 2;
+    public static final int CURRENT_WORD_ROW = 0;
 
     private PositionLetter activeLetter;
     private List<PositionLetter> correctLetters;
     private List<PositionLetter> incorrectLetters;
     private List<KeyLetter> keyLetters;
     private KeyLetter[] displayableKeyLetters;
+    private List<KeyLetter> currentWord;
 
     public PositionLetter getActiveLetter() {
         return activeLetter;
@@ -52,5 +54,13 @@ public class World {
 
     public void setDisplayableKeyLetters(KeyLetter[] displayableKeyLetters) {
         this.displayableKeyLetters = displayableKeyLetters;
+    }
+
+    public List<KeyLetter> getCurrentWord() {
+        return currentWord;
+    }
+
+    public void setCurrentWord(List<KeyLetter> currentWord) {
+        this.currentWord = currentWord;
     }
 }

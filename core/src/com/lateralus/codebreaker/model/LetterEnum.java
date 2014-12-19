@@ -18,6 +18,15 @@ public enum LetterEnum {
         return LetterEnum.values()[index];
     }
 
+    public static LetterEnum fromUppercaseChar(char c) {
+        int index = c - 65;
+        if (index < 0 || index > 25) {
+            return null;
+        }
+
+        return fromIndex(index);
+    }
+
     public static List<LetterEnum> allLetters() {
         List<LetterEnum> all = new ArrayList<>();
         for (LetterEnum letter: LetterEnum.values()) {

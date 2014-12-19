@@ -6,6 +6,7 @@ import com.lateralus.codebreaker.model.World;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.lateralus.codebreaker.controller.helper.RandomUtils.getNextValue;
@@ -14,6 +15,7 @@ import static com.lateralus.codebreaker.controller.helper.RandomUtils.randomInt;
 import com.lateralus.codebreaker.model.LetterEnum;
 import static com.lateralus.codebreaker.model.World.KEY_LETTER_ROW;
 import static com.lateralus.codebreaker.model.World.LETTER_COLUMN_COUNT;
+import static java.util.stream.Collectors.groupingBy;
 
 public class LetterController implements CodeController {
 
@@ -25,8 +27,24 @@ public class LetterController implements CodeController {
     public void initialize(World world) {
         initializeKeyLetters(world);
         initializeActiveLetter(world);
+        initializeCurrentWord(world);
         world.setCorrectLetters(new ArrayList<>());
         world.setIncorrectLetters(new ArrayList<>());
+    }
+
+    @Override
+    public void update(World world, float delta) {
+        timeSinceLastLetterFall += delta;
+        if (timeSinceLastLetterFall >= LETTER_FALL_SPEED) {
+            PositionLetter activeLetter = world.getActiveLetter();
+            int currentRow = activeLetter.getRow();
+            if (activeLetterWillHitBottom(currentRow) || activeLetterWillHitOtherLetter(world)) {
+                onActiveLetterHit(world);
+            } else {
+                activeLetter.setRow(currentRow - 1);
+            }
+            timeSinceLastLetterFall = 0f;
+        }
     }
 
     private void initializeKeyLetters(World world) {
@@ -48,19 +66,24 @@ public class LetterController implements CodeController {
         world.setDisplayableKeyLetters(displayableKeyLetters);
     }
 
-    @Override
-    public void update(World world, float delta) {
-        timeSinceLastLetterFall += delta;
-        if (timeSinceLastLetterFall >= LETTER_FALL_SPEED) {
-            PositionLetter activeLetter = world.getActiveLetter();
-            int currentRow = activeLetter.getRow();
-            if (activeLetterWillHitBottom(currentRow) || activeLetterWillHitOtherLetter(world)) {
-                onActiveLetterHit(world);
-            } else {
-                activeLetter.setRow(currentRow - 1);
+    private void initializeCurrentWord(World world) {
+        Map<LetterEnum, List<KeyLetter>> keyLettersByValue = world.getKeyLetters().stream()
+                .collect(groupingBy(KeyLetter::getValueLetter));
+
+        String word = "hello"; // TODO
+        List<KeyLetter> currentWord = new ArrayList<>();
+        
+        for (char c : word.toUpperCase().toCharArray()) {
+            LetterEnum currentLetter = LetterEnum.fromUppercaseChar(c);
+            if (currentLetter == null) {
+                // TODO - prune dictionary so this won't ever happen
+                break;
             }
-            timeSinceLastLetterFall = 0f;
+            List<KeyLetter> keyLetters = keyLettersByValue.get(currentLetter);
+            currentWord.add(keyLetters.get(0));
         }
+
+        world.setCurrentWord(currentWord);
     }
 
     private boolean activeLetterWillHitBottom(int currentRow) {

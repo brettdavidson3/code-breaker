@@ -9,8 +9,6 @@ import com.lateralus.codebreaker.model.PositionLetter;
 import com.lateralus.codebreaker.model.KeyLetter;
 import com.lateralus.codebreaker.model.World;
 
-import java.util.function.Predicate;
-
 import static com.lateralus.codebreaker.model.World.*;
 
 public class LetterRenderer implements CodeRenderer {
@@ -19,12 +17,14 @@ public class LetterRenderer implements CodeRenderer {
 
     private Sprite[][] sprites;
     private PositionLetter[][] randomLetters;
-    private TextureRegion[] blueTextures;
     private TextureRegion[] greenTextures;
-    private TextureRegion[] grayTextures;
+    private TextureRegion[] goldTextures;
+    private TextureRegion[] blueCodeTextures;
+    private TextureRegion[] grayCodeTextures;
     private TextureRegion[] specialTextures;
     private Texture letterTexture;
     private float timeSinceLastRandomLetters = 0f;
+    private int startColumnForCurrentWord;
 
     @Override
     public void initialize(World world) {
@@ -32,6 +32,7 @@ public class LetterRenderer implements CodeRenderer {
         initializeSprites();
         initalizeTextures();
         initializeRandomLetters();
+        calculateStartColumnForCurrentWord(world);
     }
 
     @Override
@@ -63,6 +64,7 @@ public class LetterRenderer implements CodeRenderer {
         updateActiveSprite(world);
         updateKeySprites(world);
         updateIncorrectSprites(world);
+        updateCurrentWordSprites(world);
     }
 
     private void drawSprites(SpriteBatch spriteBatch) {
@@ -94,19 +96,24 @@ public class LetterRenderer implements CodeRenderer {
     }
 
     private void initalizeTextures() {
-        grayTextures = new TextureRegion[26];
-        for (int i = 0; i < 26; i++) {
-            grayTextures[i] = getLetterTextureRegion(i, 3);
-        }
-
-        blueTextures = new TextureRegion[26];
-        for (int i = 0; i < 26; i++) {
-            blueTextures[i] = getLetterTextureRegion(i, 4);
-        }
-
         greenTextures = new TextureRegion[26];
         for (int i = 0; i < 26; i++) {
             greenTextures[i] = getLetterTextureRegion(i, 0);
+        }
+
+        goldTextures = new TextureRegion[26];
+        for (int i = 0; i < 26; i++) {
+            goldTextures[i] = getLetterTextureRegion(i, 2);
+        }
+
+        grayCodeTextures = new TextureRegion[26];
+        for (int i = 0; i < 26; i++) {
+            grayCodeTextures[i] = getLetterTextureRegion(i, 3);
+        }
+
+        blueCodeTextures = new TextureRegion[26];
+        for (int i = 0; i < 26; i++) {
+            blueCodeTextures[i] = getLetterTextureRegion(i, 4);
         }
 
         specialTextures = new TextureRegion[26];
@@ -129,12 +136,20 @@ public class LetterRenderer implements CodeRenderer {
         }
     }
 
+    private void calculateStartColumnForCurrentWord(World world) {
+        int wordLength = world.getCurrentWord().size();
+        if (wordLength % 2 == 1) {
+            wordLength++;
+        }
+        startColumnForCurrentWord = (LETTER_COLUMN_COUNT / 2) - (wordLength / 2);
+    }
+
     private TextureRegion getLetterTextureRegion(int row, int col) {
         return new TextureRegion(letterTexture, row * 90, col * 90, 90, 90);
     }
 
     private void updateBackgroundSprite(Sprite currentSprite, int col, int row) {
-        currentSprite.setRegion(grayTextures[randomLetters[col][row].getValue().getIndex()]);
+        currentSprite.setRegion(grayCodeTextures[randomLetters[col][row].getValue().getIndex()]);
     }
 
     private void updateActiveSprite(World world) {
@@ -149,13 +164,27 @@ public class LetterRenderer implements CodeRenderer {
         for (int col = 0; col < LETTER_COLUMN_COUNT; col++) {
             Sprite currentSprite = sprites[col][row];
             KeyLetter currentKeyLetter = world.getDisplayableKeyLetters()[col];
-            currentSprite.setRegion(blueTextures[currentKeyLetter.getKeyLetter().getIndex()]);
+            currentSprite.setRegion(blueCodeTextures[currentKeyLetter.getKeyLetter().getIndex()]);
         }
     }
 
     private void updateIncorrectSprites(World world) {
         for (PositionLetter incorrectLetter: world.getIncorrectLetters()) {
             sprites[incorrectLetter.getCol()][incorrectLetter.getRow()].setRegion(specialTextures[0]);
+        }
+    }
+
+    private void updateCurrentWordSprites(World world) {
+        int currentColumn = startColumnForCurrentWord;
+        for (KeyLetter letter : world.getCurrentWord()) {
+            TextureRegion texture;
+            if (letter.isSolved()) {
+                texture = goldTextures[letter.getValueLetter().getIndex()];
+            } else {
+                texture = blueCodeTextures[letter.getKeyLetter().getIndex()];
+            }
+            sprites[currentColumn][CURRENT_WORD_ROW].setRegion(texture);
+            currentColumn++;
         }
     }
 
