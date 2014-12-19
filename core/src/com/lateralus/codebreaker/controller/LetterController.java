@@ -1,8 +1,7 @@
 package com.lateralus.codebreaker.controller;
 
-import com.lateralus.codebreaker.controller.helper.NumberUtils;
-import com.lateralus.codebreaker.controller.helper.RandomUtils;
 import com.lateralus.codebreaker.model.KeyLetter;
+import com.lateralus.codebreaker.model.LetterEnum;
 import com.lateralus.codebreaker.model.PositionLetter;
 import com.lateralus.codebreaker.model.World;
 
@@ -12,11 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.lateralus.codebreaker.controller.helper.CollectionUtils.newArrayList;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.lateralus.codebreaker.controller.helper.NumberUtils.numberRange;
 import static com.lateralus.codebreaker.controller.helper.RandomUtils.getNextValue;
 import static com.lateralus.codebreaker.controller.helper.RandomUtils.randomInt;
-
-import com.lateralus.codebreaker.model.LetterEnum;
 import static com.lateralus.codebreaker.model.World.KEY_LETTER_ROW;
 import static com.lateralus.codebreaker.model.World.LETTER_COLUMN_COUNT;
 import static java.util.stream.Collectors.groupingBy;
@@ -70,7 +68,7 @@ public class LetterController implements CodeController {
         KeyLetter[] displayableKeyLetters = new KeyLetter[LETTER_COLUMN_COUNT];
 
         HashSet<KeyLetter> keyLetterSet = new HashSet<>(world.getCurrentWord());
-        List<Integer> possibleKeyLetterCols = NumberUtils.numberRange(12);
+        List<Integer> possibleKeyLetterCols = numberRange(12);
         for (KeyLetter keyLetter : keyLetterSet) {
             Integer col = getNextValue(possibleKeyLetterCols);
             displayableKeyLetters[col] = keyLetter;
@@ -127,7 +125,7 @@ public class LetterController implements CodeController {
 
     private boolean activeLetterWillHit(World world, PositionLetter letter) {
         return world.getActiveLetter().getCol() == letter.getCol() &&
-               world.getActiveLetter().getRow() <= letter.getRow() + 1;
+                world.getActiveLetter().getRow() <= letter.getRow() + 1;
     }
 
     private void initializeActiveLetter(World world) {

@@ -1,16 +1,17 @@
 package com.lateralus.codebreaker.controller.helper;
 
-import java.util.ArrayList;
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.Range;
+
 import java.util.List;
+
+import static com.google.common.collect.DiscreteDomain.integers;
+import static com.google.common.collect.Lists.newArrayList;
 
 public class NumberUtils {
 
     public static List<Integer> numberRange(int size) {
-        // TODO - use guava
-        List<Integer> range = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            range.add(i);
-        }
-        return range;
+        Range<Integer> range = Range.closed(0, size - 1);
+        return newArrayList(ContiguousSet.create(range, integers()));
     }
 }
