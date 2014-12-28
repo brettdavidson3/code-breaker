@@ -39,8 +39,8 @@ public class LetterController implements CodeController {
         initializeCurrentWord(world);
         initializeDisplayableKeyLetters(world);
         initializeActiveLetter(world);
-        world.setCorrectLetters(new ArrayList<>());
-        world.setIncorrectLetters(new ArrayList<>());
+        world.setCorrectLetters(newArrayList());
+        world.setIncorrectLetters(newArrayList());
     }
 
     @Override
@@ -128,7 +128,7 @@ public class LetterController implements CodeController {
     }
 
     private void initializeKeyLetters(World world) {
-        ArrayList<KeyLetter> keyLetters = new ArrayList<>();
+        ArrayList<KeyLetter> keyLetters = newArrayList();
 
         List<LetterEnum> availableKeys = LetterEnum.allLetters();
         List<LetterEnum> availableValues = LetterEnum.allLetters();
@@ -166,7 +166,7 @@ public class LetterController implements CodeController {
                 .collect(groupingBy(KeyLetter::getValueLetter));
 
         String word = "hello"; // TODO
-        List<KeyLetter> currentWord = new ArrayList<>();
+        List<KeyLetter> currentWord = newArrayList();
 
         for (char c : word.toUpperCase().toCharArray()) {
             LetterEnum currentLetter = LetterEnum.fromUppercaseChar(c);

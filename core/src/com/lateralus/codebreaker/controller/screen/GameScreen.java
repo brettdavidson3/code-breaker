@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lateralus.codebreaker.controller.CodeController;
 import com.lateralus.codebreaker.controller.LetterController;
@@ -13,8 +12,9 @@ import com.lateralus.codebreaker.model.World;
 import com.lateralus.codebreaker.view.CodeRenderer;
 import com.lateralus.codebreaker.view.LetterRenderer;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
 
 public class GameScreen implements Screen {
 
@@ -98,7 +98,7 @@ public class GameScreen implements Screen {
     }
 
     private void initControllers() {
-        controllers = new ArrayList<>();
+        controllers = newArrayList();
 
         controllers.add(new LetterController());
 
@@ -108,7 +108,7 @@ public class GameScreen implements Screen {
     }
 
     private void initRenderers() {
-        renderers = new ArrayList<>();
+        renderers = newArrayList();
 
         renderers.add(new LetterRenderer());
 
