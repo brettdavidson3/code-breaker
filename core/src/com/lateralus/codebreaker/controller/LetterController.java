@@ -2,6 +2,7 @@ package com.lateralus.codebreaker.controller;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.lateralus.codebreaker.controller.helper.RandomUtils;
 import com.lateralus.codebreaker.model.KeyLetter;
 import com.lateralus.codebreaker.model.LetterEnum;
 import com.lateralus.codebreaker.model.PositionLetter;
@@ -147,7 +148,15 @@ public class LetterController implements CodeController {
     }
 
     private List<LetterEnum> initializeWord() {
-        String word = "hello"; // TODO
+        ArrayList<String> words = newArrayList("Our", "personal", "business", "area", "includes", "personal", "organizers", "that", "can",
+                "help", "you", "manage", "your", "finances,", "loans", "and", "budgets.", "This", "section", "also", "includes",
+                "resume", "and", "letter", "templates,", "personal", "organizers,", "planners", "and", "checklists.",
+                "We", "have", "a", "wide", "variety", "of", "calendars", "including", "annual", "and", "monthly", "with", "a",
+                "variety", "of", "formats", "including", "day", "planners.", "Our", "Parenting", "section", "includes", "educational",
+                "tools,", "math", "worksheets", "and", "parenting", "forms", "for", "download.", "Also", "check", "out", "other",
+                "forms", "for", "managing", "and", "organizing", "sporting", "events,", "hobbies,", "recreation", "and", "tournaments."
+        );
+        String word = RandomUtils.getNextValue(words);
         List<LetterEnum> newWord = newArrayList();
 
         for (char c : word.toUpperCase().toCharArray()) {
@@ -192,7 +201,7 @@ public class LetterController implements CodeController {
             availableLetters = getAvailableLetters(world);
         }
 
-        world.setActiveLetter(new PositionLetter(randomInt(12), LETTER_ROW_COUNT, getNextValue(availableLetters)));
+        world.setActiveLetter(new PositionLetter(randomInt(12), LETTER_ROW_COUNT + 1, getNextValue(availableLetters)));
     }
 
     private List<LetterEnum> getAvailableLetters(World world) {
