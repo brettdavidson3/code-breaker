@@ -10,9 +10,9 @@ public class KeyLetter {
     private LetterEnum valueLetter;
     private boolean isSolved;
 
-    public KeyLetter(List<LetterEnum> availableKeys, List<LetterEnum> availableValues) {
+    public KeyLetter(List<LetterEnum> availableKeys, LetterEnum valueLetter) {
         this.keyLetter = getNextValue(availableKeys);
-        this.valueLetter = getNextValue(availableValues);
+        this.valueLetter = valueLetter;
         isSolved = false;
     }
 

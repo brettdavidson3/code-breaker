@@ -8,20 +8,17 @@ import com.lateralus.codebreaker.model.PositionLetter;
 import com.lateralus.codebreaker.model.World;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.lateralus.codebreaker.controller.helper.NumberUtils.numberRange;
 import static com.lateralus.codebreaker.controller.helper.RandomUtils.getNextValue;
 import static com.lateralus.codebreaker.controller.helper.RandomUtils.randomInt;
 import static com.lateralus.codebreaker.model.World.KEY_LETTER_ROW;
 import static com.lateralus.codebreaker.model.World.LETTER_COLUMN_COUNT;
+import static com.lateralus.codebreaker.model.World.LETTER_ROW_COUNT;
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 
 public class LetterController implements CodeController {
 
@@ -36,8 +33,6 @@ public class LetterController implements CodeController {
     @Override
     public void initialize(World world) {
         initializeKeyLetters(world);
-        initializeCurrentWord(world);
-        initializeDisplayableKeyLetters(world);
         initializeActiveLetter(world);
         world.setCorrectLetters(newArrayList());
         world.setIncorrectLetters(newArrayList());
@@ -130,55 +125,40 @@ public class LetterController implements CodeController {
     private void initializeKeyLetters(World world) {
         ArrayList<KeyLetter> keyLetters = newArrayList();
 
+        List<LetterEnum> word = initializeWord();
+        int startColumn = randomInt(LETTER_COLUMN_COUNT - word.size());
+        int columnAfterEnd = startColumn + word.size();
+
         List<LetterEnum> availableKeys = LetterEnum.allLetters();
-        List<LetterEnum> availableValues = LetterEnum.allLetters();
-        for (int i = 0; i < LetterEnum.values().length; i++) {
-            KeyLetter newLetter = new KeyLetter(availableKeys, availableValues);
-            keyLetters.add(newLetter);
+
+        for (int i = 0; i < startColumn; i++) {
+            keyLetters.add(new KeyLetter(availableKeys, LetterEnum.BLANK));
+        }
+
+        for (int i = startColumn; i < columnAfterEnd; i++) {
+            keyLetters.add(new KeyLetter(availableKeys, word.get(i - startColumn)));
+        }
+
+        for (int i = columnAfterEnd; i < LETTER_COLUMN_COUNT; i++) {
+            keyLetters.add(new KeyLetter(availableKeys, LetterEnum.BLANK));
         }
 
         world.setKeyLetters(keyLetters);
     }
 
-    private void initializeDisplayableKeyLetters(World world) {
-        KeyLetter[] displayableKeyLetters = new KeyLetter[LETTER_COLUMN_COUNT];
-
-        HashSet<KeyLetter> keyLetterSet = new HashSet<>(world.getCurrentWord());
-        List<Integer> possibleKeyLetterCols = numberRange(12);
-        for (KeyLetter keyLetter : keyLetterSet) {
-            Integer col = getNextValue(possibleKeyLetterCols);
-            displayableKeyLetters[col] = keyLetter;
-        }
-
-        List<KeyLetter> remainingKeyLetters = world.getKeyLetters().stream()
-                .filter(kl -> !keyLetterSet.contains(kl))
-                .collect(toList());
-        while (!possibleKeyLetterCols.isEmpty()) {
-            Integer col = getNextValue(possibleKeyLetterCols);
-            displayableKeyLetters[col] = getNextValue(remainingKeyLetters);
-        }
-
-        world.setDisplayableKeyLetters(displayableKeyLetters);
-    }
-
-    private void initializeCurrentWord(World world) {
-        Map<LetterEnum, List<KeyLetter>> keyLettersByValue = world.getKeyLetters().stream()
-                .collect(groupingBy(KeyLetter::getValueLetter));
-
+    private List<LetterEnum> initializeWord() {
         String word = "hello"; // TODO
-        List<KeyLetter> currentWord = newArrayList();
+        List<LetterEnum> newWord = newArrayList();
 
         for (char c : word.toUpperCase().toCharArray()) {
             LetterEnum currentLetter = LetterEnum.fromUppercaseChar(c);
-            if (currentLetter == null) {
-                // TODO - prune dictionary so this won't ever happen
-                break;
+            // TODO - prune dictionary so we don't get non A-Z characters
+            if (currentLetter != null) {
+                newWord.add(currentLetter);
             }
-            List<KeyLetter> keyLetters = keyLettersByValue.get(currentLetter);
-            currentWord.add(keyLetters.get(0));
         }
 
-        world.setCurrentWord(currentWord);
+        return newWord;
     }
 
     private boolean activeLetterWillHitBottom(int currentRow) {
@@ -205,23 +185,31 @@ public class LetterController implements CodeController {
     }
 
     private void initializeActiveLetter(World world) {
-        ArrayList<KeyLetter> displayableKeyLetters = newArrayList(world.getDisplayableKeyLetters());
+        List<LetterEnum> availableLetters = getAvailableLetters(world);
 
-        List<LetterEnum> availableLetters = world.getKeyLetters().stream()
-                .filter(l -> displayableKeyLetters.contains(l))
+        if (availableLetters.isEmpty()) {
+            initializeKeyLetters(world);
+            availableLetters = getAvailableLetters(world);
+        }
+
+        world.setActiveLetter(new PositionLetter(randomInt(12), LETTER_ROW_COUNT, getNextValue(availableLetters)));
+    }
+
+    private List<LetterEnum> getAvailableLetters(World world) {
+        return world.getKeyLetters().stream()
                 .filter(KeyLetter::isNotSolved)
                 .map(KeyLetter::getValueLetter)
                 .collect(Collectors.toList());
-        world.setActiveLetter(new PositionLetter(randomInt(12), 19, getNextValue(availableLetters)));
     }
 
     private void onActiveLetterHit(World world) {
-        KeyLetter keyLetter = world.getDisplayableKeyLetters()[world.getActiveLetter().getCol()];
+        PositionLetter activeLetter = world.getActiveLetter();
+        KeyLetter keyLetter = world.getKeyLetters().get(activeLetter.getCol());
 
-        if (world.getActiveLetter().getValue().equals(keyLetter.getValueLetter())) {
+        if (activeLetter.getValue().equals(keyLetter.getValueLetter())) {
             keyLetter.setSolved(true);
         } else {
-            world.getIncorrectLetters().add(world.getActiveLetter());
+            world.getIncorrectLetters().add(activeLetter);
         }
         initializeActiveLetter(world);
     }

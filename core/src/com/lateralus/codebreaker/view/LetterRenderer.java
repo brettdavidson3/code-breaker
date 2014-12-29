@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.lateralus.codebreaker.model.PositionLetter;
 import com.lateralus.codebreaker.model.KeyLetter;
+import com.lateralus.codebreaker.model.PositionLetter;
 import com.lateralus.codebreaker.model.World;
 
 import static com.lateralus.codebreaker.model.World.*;
@@ -24,7 +24,6 @@ public class LetterRenderer implements CodeRenderer {
     private TextureRegion[] specialTextures;
     private Texture letterTexture;
     private float timeSinceLastRandomLetters = 0f;
-    private int startColumnForCurrentWord;
 
     @Override
     public void initialize(World world) {
@@ -32,7 +31,6 @@ public class LetterRenderer implements CodeRenderer {
         initializeSprites();
         initalizeTextures();
         initializeRandomLetters();
-        calculateStartColumnForCurrentWord(world);
     }
 
     @Override
@@ -64,7 +62,6 @@ public class LetterRenderer implements CodeRenderer {
         updateActiveSprite(world);
         updateKeySprites(world);
         updateIncorrectSprites(world);
-        updateCurrentWordSprites(world);
     }
 
     private void drawSprites(SpriteBatch spriteBatch) {
@@ -136,14 +133,6 @@ public class LetterRenderer implements CodeRenderer {
         }
     }
 
-    private void calculateStartColumnForCurrentWord(World world) {
-        int wordLength = world.getCurrentWord().size();
-        if (wordLength % 2 == 1) {
-            wordLength++;
-        }
-        startColumnForCurrentWord = (LETTER_COLUMN_COUNT / 2) - (wordLength / 2);
-    }
-
     private TextureRegion getLetterTextureRegion(int row, int col) {
         return new TextureRegion(letterTexture, row * 90, col * 90, 90, 90);
     }
@@ -156,6 +145,13 @@ public class LetterRenderer implements CodeRenderer {
         int col = world.getActiveLetter().getCol();
         int row = world.getActiveLetter().getRow();
         Sprite currentSprite = sprites[col][row];
+
+        // TODO - ughh need fireworks
+        if (world.getActiveLetter().getValue().getIndex() == 26) {
+            currentSprite.setRegion(specialTextures[0]);
+            return;
+        }
+
         currentSprite.setRegion(greenTextures[world.getActiveLetter().getValue().getIndex()]);
     }
 
@@ -163,28 +159,33 @@ public class LetterRenderer implements CodeRenderer {
         int row = KEY_LETTER_ROW;
         for (int col = 0; col < LETTER_COLUMN_COUNT; col++) {
             Sprite currentSprite = sprites[col][row];
-            KeyLetter currentKeyLetter = world.getDisplayableKeyLetters()[col];
-            currentSprite.setRegion(blueCodeTextures[currentKeyLetter.getKeyLetter().getIndex()]);
+            KeyLetter currentKeyLetter = world.getKeyLetters().get(col);
+
+            TextureRegion texture;
+            if (currentKeyLetter.isSolved()) {
+                // TODO - ughh need fireworks
+                if (currentKeyLetter.getValueLetter().getIndex() == 26) {
+                    currentSprite.setRegion(specialTextures[0]);
+                    continue;
+                }
+
+                texture = goldTextures[currentKeyLetter.getValueLetter().getIndex()];
+            } else {
+                // TODO - ughh need fireworks
+                if (currentKeyLetter.getKeyLetter().getIndex() == 26) {
+                    currentSprite.setRegion(specialTextures[0]);
+                    continue;
+                }
+
+                texture = blueCodeTextures[currentKeyLetter.getKeyLetter().getIndex()];
+            }
+            currentSprite.setRegion(texture);
         }
     }
 
     private void updateIncorrectSprites(World world) {
-        for (PositionLetter incorrectLetter: world.getIncorrectLetters()) {
+        for (PositionLetter incorrectLetter : world.getIncorrectLetters()) {
             sprites[incorrectLetter.getCol()][incorrectLetter.getRow()].setRegion(specialTextures[0]);
-        }
-    }
-
-    private void updateCurrentWordSprites(World world) {
-        int currentColumn = startColumnForCurrentWord;
-        for (KeyLetter letter : world.getCurrentWord()) {
-            TextureRegion texture;
-            if (letter.isSolved()) {
-                texture = goldTextures[letter.getValueLetter().getIndex()];
-            } else {
-                texture = blueCodeTextures[letter.getKeyLetter().getIndex()];
-            }
-            sprites[currentColumn][CURRENT_WORD_ROW].setRegion(texture);
-            currentColumn++;
         }
     }
 
