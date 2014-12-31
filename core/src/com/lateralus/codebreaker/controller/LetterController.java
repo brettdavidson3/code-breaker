@@ -33,6 +33,7 @@ public class LetterController implements CodeController {
 
     @Override
     public void initialize(World world) {
+        world.setDifficulty(World.Difficulty.Normal); // TODO: make dynamic
         initializeKeyLetters(world);
         initializeActiveLetter(world);
         world.setCorrectLetters(newArrayList());
@@ -126,7 +127,7 @@ public class LetterController implements CodeController {
     private void initializeKeyLetters(World world) {
         ArrayList<KeyLetter> keyLetters = newArrayList();
 
-        List<LetterEnum> word = initializeWord();
+        List<LetterEnum> word = initializeWord(world);
         int startColumn = randomInt(LETTER_COLUMN_COUNT - word.size());
         int columnAfterEnd = startColumn + word.size();
 
@@ -147,24 +148,16 @@ public class LetterController implements CodeController {
         world.setKeyLetters(keyLetters);
     }
 
-    private List<LetterEnum> initializeWord() {
-        ArrayList<String> words = newArrayList("Our", "personal", "business", "area", "includes", "personal", "organizers", "that", "can",
-                "help", "you", "manage", "your", "finances,", "loans", "and", "budgets.", "This", "section", "also", "includes",
-                "resume", "and", "letter", "templates,", "personal", "organizers,", "planners", "and", "checklists.",
-                "We", "have", "a", "wide", "variety", "of", "calendars", "including", "annual", "and", "monthly", "with", "a",
-                "variety", "of", "formats", "including", "day", "planners.", "Our", "Parenting", "section", "includes", "educational",
-                "tools,", "math", "worksheets", "and", "parenting", "forms", "for", "download.", "Also", "check", "out", "other",
-                "forms", "for", "managing", "and", "organizing", "sporting", "events,", "hobbies,", "recreation", "and", "tournaments."
-        );
-        String word = RandomUtils.getNextValue(words);
+    private List<LetterEnum> initializeWord(World world) {
+        String word = RandomUtils.getNextValue(world.getWordList());
         List<LetterEnum> newWord = newArrayList();
 
         for (char c : word.toUpperCase().toCharArray()) {
             LetterEnum currentLetter = LetterEnum.fromUppercaseChar(c);
-            // TODO - prune dictionary so we don't get non A-Z characters
-            if (currentLetter != null) {
-                newWord.add(currentLetter);
+            if (currentLetter == null) {
+                throw new RuntimeException("Invalid word detected in dictionary! Word was: " + word);
             }
+            newWord.add(currentLetter);
         }
 
         return newWord;

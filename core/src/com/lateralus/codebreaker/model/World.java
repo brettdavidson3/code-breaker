@@ -8,10 +8,14 @@ public class World {
     public static final int LETTER_ROW_COUNT = 17;
     public static final int KEY_LETTER_ROW = 0;
 
+    public enum Difficulty { Easy, Normal, Hard }
+
     private PositionLetter activeLetter;
     private List<PositionLetter> correctLetters;
     private List<PositionLetter> incorrectLetters;
     private List<KeyLetter> keyLetters;
+    private Difficulty difficulty;
+    private List<String> wordList;
 
     public PositionLetter getActiveLetter() {
         return activeLetter;
@@ -45,4 +49,16 @@ public class World {
         this.incorrectLetters = incorrectLetters;
     }
 
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
+        this.wordList = WordList.getWordList(difficulty);
+    }
+
+    public List<String> getWordList() {
+        return wordList;
+    }
 }
