@@ -2,7 +2,7 @@ package com.lateralus.codebreaker.controller;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.lateralus.codebreaker.controller.helper.RandomUtils;
+import com.lateralus.codebreaker.util.RandomUtils;
 import com.lateralus.codebreaker.model.KeyLetter;
 import com.lateralus.codebreaker.model.LetterEnum;
 import com.lateralus.codebreaker.model.PositionLetter;
@@ -14,8 +14,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.lateralus.codebreaker.controller.helper.RandomUtils.getNextValue;
-import static com.lateralus.codebreaker.controller.helper.RandomUtils.randomInt;
+import static com.lateralus.codebreaker.util.RandomUtils.getNextValue;
+import static com.lateralus.codebreaker.util.RandomUtils.randomInt;
 import static com.lateralus.codebreaker.model.World.KEY_LETTER_ROW;
 import static com.lateralus.codebreaker.model.World.LETTER_COLUMN_COUNT;
 import static com.lateralus.codebreaker.model.World.LETTER_ROW_COUNT;

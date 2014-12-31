@@ -1,6 +1,6 @@
 package com.lateralus.codebreaker.model;
 
-import static com.lateralus.codebreaker.controller.helper.RandomUtils.randomInt;
+import static com.lateralus.codebreaker.util.RandomUtils.randomInt;
 
 public class PositionLetter {
 

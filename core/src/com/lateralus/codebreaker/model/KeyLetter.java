@@ -2,7 +2,7 @@ package com.lateralus.codebreaker.model;
 
 import java.util.List;
 
-import static com.lateralus.codebreaker.controller.helper.RandomUtils.getNextValue;
+import static com.lateralus.codebreaker.util.RandomUtils.getNextValue;
 
 public class KeyLetter {
 

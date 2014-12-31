@@ -18,6 +18,7 @@ public class LetterRenderer implements CodeRenderer {
     private Sprite[][] sprites;
     private PositionLetter[][] randomLetters;
     private TextureRegion[] greenTextures;
+    private TextureRegion[] whiteTextures;
     private TextureRegion[] goldTextures;
     private TextureRegion[] blueCodeTextures;
     private TextureRegion[] grayCodeTextures;
@@ -96,6 +97,11 @@ public class LetterRenderer implements CodeRenderer {
         greenTextures = new TextureRegion[26];
         for (int i = 0; i < 26; i++) {
             greenTextures[i] = getLetterTextureRegion(i, 0);
+        }
+
+        whiteTextures = new TextureRegion[26];
+        for (int i = 0; i < 26; i++) {
+            whiteTextures[i] = getLetterTextureRegion(i, 1);
         }
 
         goldTextures = new TextureRegion[26];
@@ -185,7 +191,15 @@ public class LetterRenderer implements CodeRenderer {
 
     private void updateIncorrectSprites(World world) {
         for (PositionLetter incorrectLetter : world.getIncorrectLetters()) {
-            sprites[incorrectLetter.getCol()][incorrectLetter.getRow()].setRegion(specialTextures[0]);
+
+            // TODO - ughh need fireworks
+            if (incorrectLetter.getValue().getIndex() == 26) {
+                sprites[incorrectLetter.getCol()][incorrectLetter.getRow()].setRegion(specialTextures[0]);
+                continue;
+            }
+
+            TextureRegion textureRegion = whiteTextures[incorrectLetter.getValue().getIndex()];
+            sprites[incorrectLetter.getCol()][incorrectLetter.getRow()].setRegion(textureRegion);
         }
     }
 

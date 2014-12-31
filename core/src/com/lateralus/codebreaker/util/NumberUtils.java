@@ -1,4 +1,4 @@
-package com.lateralus.codebreaker.controller.helper;
+package com.lateralus.codebreaker.util;
 
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.Range;

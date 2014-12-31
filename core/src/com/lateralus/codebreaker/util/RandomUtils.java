@@ -1,4 +1,4 @@
-package com.lateralus.codebreaker.controller.helper;
+package com.lateralus.codebreaker.util;
 
 import java.util.List;
 import java.util.Random;
