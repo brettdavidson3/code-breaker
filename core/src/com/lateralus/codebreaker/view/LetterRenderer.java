@@ -5,10 +5,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.lateralus.codebreaker.model.KeyLetter;
-import com.lateralus.codebreaker.model.PositionLetter;
-import com.lateralus.codebreaker.model.World;
+import com.lateralus.codebreaker.model.*;
 
+import java.util.List;
+
+import static com.lateralus.codebreaker.model.WordConstants.*;
 import static com.lateralus.codebreaker.model.World.*;
 
 public class LetterRenderer implements CodeRenderer {
@@ -60,6 +61,59 @@ public class LetterRenderer implements CodeRenderer {
     }
 
     private void applySprites(World world) {
+        switch (world.getScreen()) {
+            case Title: applyTitleSprites(world); break;
+            case Game: applyGameSprites(world); break;
+            case Lose:
+        }
+    }
+
+    private void applyTitleSprites(World world) {
+        int currentCol = centerWord(WORD_CODE.size() + WORD_BREAKER.size() + 1);
+        currentCol = drawWord(currentCol, 15, goldTextures, WORD_CODE);
+        currentCol++;
+        drawWord(currentCol, 15, goldTextures, WORD_BREAKER);
+
+        currentCol = centerWord(WORD_EASY.size());
+        drawWord(currentCol, 12, whiteTextures, WORD_EASY);
+
+        currentCol = centerWord(WORD_NORMAL.size());
+        drawIndicator(world, currentCol - 1);
+        drawIndicator(world, currentCol + WORD_NORMAL.size());
+
+        drawWord(currentCol, 11, whiteTextures, WORD_NORMAL);
+        currentCol = centerWord(WORD_HARD.size());
+        drawWord(currentCol, 10, whiteTextures, WORD_HARD);
+    }
+
+    private void drawIndicator(World world, int col) {
+        int indicatorRow;
+        switch (world.getDifficulty()) {
+            case Easy:      indicatorRow = 12; break;
+            case Hard:      indicatorRow = 10; break;
+            default:
+            case Normal:    indicatorRow = 11; break;
+        }
+        drawLetter(col, indicatorRow, goldTextures, LetterEnum.A); // TODO need fireworks
+    }
+
+    private int centerWord(int length) {
+        return (int) Math.floor((LETTER_COLUMN_COUNT - length) / 2);
+    }
+
+    private int drawWord(int col, int row, TextureRegion[] textures, List<LetterEnum> word) {
+        for (LetterEnum letter : word) {
+            drawLetter(col, row, textures, letter);
+            col++;
+        }
+        return col;
+    }
+
+    private void drawLetter(int col, int row, TextureRegion[] textures, LetterEnum letter) {
+        sprites[col][row].setRegion(textures[letter.getIndex()]);
+    }
+
+    private void applyGameSprites(World world) {
         updateActiveSprite(world);
         updateKeySprites(world);
         updateIncorrectSprites(world);

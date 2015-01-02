@@ -8,6 +8,7 @@ public class World {
     public static final int LETTER_ROW_COUNT = 17;
     public static final int KEY_LETTER_ROW = 0;
 
+    public enum Screen { Title, Game, Lose }
     public enum Difficulty { Easy, Normal, Hard }
 
     private PositionLetter activeLetter;
@@ -16,6 +17,12 @@ public class World {
     private List<KeyLetter> keyLetters;
     private Difficulty difficulty;
     private List<String> wordList;
+    private Screen screen;
+
+    public World() {
+        screen = Screen.Title;
+        setDifficulty(Difficulty.Normal);
+    }
 
     public PositionLetter getActiveLetter() {
         return activeLetter;
@@ -55,10 +62,18 @@ public class World {
 
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
-        this.wordList = WordList.getWordList(difficulty);
+        this.wordList = WordConstants.getWordList(difficulty);
     }
 
     public List<String> getWordList() {
         return wordList;
+    }
+
+    public Screen getScreen() {
+        return screen;
+    }
+
+    public void setScreen(Screen screen) {
+        this.screen = screen;
     }
 }

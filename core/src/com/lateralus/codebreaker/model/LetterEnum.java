@@ -32,6 +32,20 @@ public enum LetterEnum {
         return newArrayList(LetterEnum.values());
     }
 
+    public static List<LetterEnum> newWord(String word) {
+        List<LetterEnum> newWord = newArrayList();
+
+        for (char c : word.toUpperCase().toCharArray()) {
+            LetterEnum currentLetter = LetterEnum.fromUppercaseChar(c);
+            if (currentLetter == null) {
+                throw new RuntimeException("Invalid word detected! Word was: " + word);
+            }
+            newWord.add(currentLetter);
+        }
+
+        return newWord;
+    }
+
     public int getIndex() {
         return index;
     }

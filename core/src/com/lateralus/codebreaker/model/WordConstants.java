@@ -3,8 +3,15 @@ package com.lateralus.codebreaker.model;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.lateralus.codebreaker.model.LetterEnum.newWord;
 
-public class WordList {
+public class WordConstants {
+
+    public static List<LetterEnum> WORD_CODE = newWord("code");
+    public static List<LetterEnum> WORD_BREAKER = newWord("breaker");
+    public static List<LetterEnum> WORD_EASY = newWord("easy");
+    public static List<LetterEnum> WORD_NORMAL = newWord("normal");
+    public static List<LetterEnum> WORD_HARD = newWord("hard");
 
     public static List<String> getWordList(World.Difficulty difficulty) {
         switch (difficulty) {

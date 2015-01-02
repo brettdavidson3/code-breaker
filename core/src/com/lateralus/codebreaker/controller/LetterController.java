@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.lateralus.codebreaker.model.LetterEnum.newWord;
 import static com.lateralus.codebreaker.util.RandomUtils.getNextValue;
 import static com.lateralus.codebreaker.util.RandomUtils.randomInt;
 import static com.lateralus.codebreaker.model.World.KEY_LETTER_ROW;
@@ -33,7 +34,6 @@ public class LetterController implements CodeController {
 
     @Override
     public void initialize(World world) {
-        world.setDifficulty(World.Difficulty.Normal); // TODO: make dynamic
         initializeKeyLetters(world);
         initializeActiveLetter(world);
         world.setCorrectLetters(newArrayList());
@@ -149,18 +149,7 @@ public class LetterController implements CodeController {
     }
 
     private List<LetterEnum> initializeWord(World world) {
-        String word = RandomUtils.getNextValue(world.getWordList());
-        List<LetterEnum> newWord = newArrayList();
-
-        for (char c : word.toUpperCase().toCharArray()) {
-            LetterEnum currentLetter = LetterEnum.fromUppercaseChar(c);
-            if (currentLetter == null) {
-                throw new RuntimeException("Invalid word detected in dictionary! Word was: " + word);
-            }
-            newWord.add(currentLetter);
-        }
-
-        return newWord;
+        return newWord(RandomUtils.getNextValue(world.getWordList()));
     }
 
     private boolean activeLetterWillHitBottom(int currentRow) {

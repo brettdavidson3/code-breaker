@@ -20,9 +20,9 @@ public class GameScreen implements Screen {
 
     private SpriteBatch spriteBatch;
     private OrthographicCamera camera;
-    private List<CodeController> controllers;
-    private List<CodeRenderer> renderers;
     private World world;
+    private LetterController letterController;
+    private LetterRenderer letterRenderer;
 
     public GameScreen(Game game) {
         spriteBatch = new SpriteBatch();
@@ -42,8 +42,10 @@ public class GameScreen implements Screen {
     }
 
     private void updateControllers(float delta) {
-        for (CodeController controller : controllers) {
-            controller.update(world, delta);
+        switch (world.getScreen()) {
+            case Title: break;
+            case Game: letterController.update(world, delta); break;
+            case Lose: break;
         }
     }
 
@@ -51,9 +53,7 @@ public class GameScreen implements Screen {
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
 
-        for (CodeRenderer renderer : renderers) {
-            renderer.render(spriteBatch, world, delta);
-        }
+        letterRenderer.render(spriteBatch, world, delta);
 
         spriteBatch.end();
     }
@@ -98,23 +98,13 @@ public class GameScreen implements Screen {
     }
 
     private void initControllers() {
-        controllers = newArrayList();
-
-        controllers.add(new LetterController());
-
-        for (CodeController controller : controllers) {
-            controller.initialize(world);
-        }
+        letterController = new LetterController();
+        letterController.initialize(world);
     }
 
     private void initRenderers() {
-        renderers = newArrayList();
-
-        renderers.add(new LetterRenderer());
-
-        for (CodeRenderer renderer : renderers) {
-            renderer.initialize(world);
-        }
+        letterRenderer = new LetterRenderer();
+        letterRenderer.initialize(world);
     }
 
 }
