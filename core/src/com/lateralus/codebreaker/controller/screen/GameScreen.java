@@ -8,11 +8,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lateralus.codebreaker.controller.CodeController;
 import com.lateralus.codebreaker.controller.LetterController;
+import com.lateralus.codebreaker.controller.TitleController;
 import com.lateralus.codebreaker.model.World;
-import com.lateralus.codebreaker.view.CodeRenderer;
 import com.lateralus.codebreaker.view.LetterRenderer;
-
-import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -21,14 +19,15 @@ public class GameScreen implements Screen {
     private SpriteBatch spriteBatch;
     private OrthographicCamera camera;
     private World world;
-    private LetterController letterController;
+    private CodeController currentController;
+    private World.Screen lastScreen;
     private LetterRenderer letterRenderer;
 
     public GameScreen(Game game) {
         spriteBatch = new SpriteBatch();
         world = new World();
+        createControllerForCurrentScreen();
         initViewport();
-        initControllers();
         initRenderers();
     }
 
@@ -42,10 +41,26 @@ public class GameScreen implements Screen {
     }
 
     private void updateControllers(float delta) {
-        switch (world.getScreen()) {
-            case Title: break;
-            case Game: letterController.update(world, delta); break;
-            case Lose: break;
+        lastScreen = world.getScreen();
+
+        currentController.update(delta);
+
+        if (lastScreen != world.getScreen()) {
+            createControllerForCurrentScreen();
+        }
+    }
+
+    private void createControllerForCurrentScreen() {
+        currentController = getControllerForScreen(world.getScreen());
+        currentController.initialize(world);
+    }
+
+    private CodeController getControllerForScreen(World.Screen screen) {
+        switch (screen) {
+            case Title: return new TitleController();
+            case Game:  return new LetterController();
+            default:
+            case Lose:  return null;
         }
     }
 
@@ -95,11 +110,6 @@ public class GameScreen implements Screen {
         camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
         camera.zoom = 2; // TODO: make dynamic
         camera.update();
-    }
-
-    private void initControllers() {
-        letterController = new LetterController();
-        letterController.initialize(world);
     }
 
     private void initRenderers() {

@@ -2,11 +2,12 @@ package com.lateralus.codebreaker.controller;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.lateralus.codebreaker.util.RandomUtils;
+import com.lateralus.codebreaker.controller.input.InputListener;
 import com.lateralus.codebreaker.model.KeyLetter;
 import com.lateralus.codebreaker.model.LetterEnum;
 import com.lateralus.codebreaker.model.PositionLetter;
 import com.lateralus.codebreaker.model.World;
+import com.lateralus.codebreaker.util.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,84 +16,58 @@ import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.lateralus.codebreaker.model.LetterEnum.newWord;
+import static com.lateralus.codebreaker.model.World.*;
 import static com.lateralus.codebreaker.util.RandomUtils.getNextValue;
 import static com.lateralus.codebreaker.util.RandomUtils.randomInt;
-import static com.lateralus.codebreaker.model.World.KEY_LETTER_ROW;
-import static com.lateralus.codebreaker.model.World.LETTER_COLUMN_COUNT;
-import static com.lateralus.codebreaker.model.World.LETTER_ROW_COUNT;
-import static java.util.stream.Collectors.groupingBy;
 
 public class LetterController implements CodeController {
 
     private static final float LETTER_FALL_SPEED = 0.4f;
     private static final float LETTER_FALL_SPEED_MULTIPLIER = 5f;
-    private static final float COLUMN_CHANGE_SPEED = 0.125f;
 
     private float timeSinceLastLetterFall = 0f;
-    private float timeSinceLastColumnChange = 0f;
-    private int currentKeyPressed;
+    private World world;
+    private InputListener inputListener;
 
     @Override
     public void initialize(World world) {
-        initializeKeyLetters(world);
-        initializeActiveLetter(world);
+        this.world = world;
+        initializeKeyLetters();
+        initializeActiveLetter();
         world.setCorrectLetters(newArrayList());
         world.setIncorrectLetters(newArrayList());
+        initializeInputListener();
+    }
+
+    private void initializeInputListener() {
+        inputListener = new InputListener();
+        inputListener.addKeyListener(Input.Keys.LEFT, this::moveActiveLetterLeft);
+        inputListener.addKeyListener(Input.Keys.RIGHT, this::moveActiveLetterRight);
     }
 
     @Override
-    public void update(World world, float delta) {
-        updateActiveLetterCol(world, delta);
-        updateActiveLetterRow(world, delta);
+    public void update(float delta) {
+        inputListener.checkInput(delta);
+        updateActiveLetterRow(delta);
     }
 
-    private void updateActiveLetterCol(World world, float delta) {
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            if (currentKeyPressed == Input.Keys.LEFT) {
-                timeSinceLastColumnChange += delta;
-                if (timeSinceLastColumnChange >= COLUMN_CHANGE_SPEED) {
-                    moveActiveLetterLeft(world);
-                    timeSinceLastColumnChange = 0f;
-                }
-            } else {
-                moveActiveLetterLeft(world);
-                timeSinceLastColumnChange = 0f;
-                currentKeyPressed = Input.Keys.LEFT;
-            }
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            if (currentKeyPressed == Input.Keys.RIGHT) {
-                timeSinceLastColumnChange += delta;
-                if (timeSinceLastColumnChange >= COLUMN_CHANGE_SPEED) {
-                    moveActiveLetterRight(world);
-                    timeSinceLastColumnChange = 0f;
-                }
-            } else {
-                moveActiveLetterRight(world);
-                timeSinceLastColumnChange = 0f;
-                currentKeyPressed = Input.Keys.RIGHT;
-            }
-        } else {
-            currentKeyPressed = -1;
-        }
-    }
-
-    private void moveActiveLetterLeft(World world) {
+    private void moveActiveLetterLeft() {
         int currentColumn = world.getActiveLetter().getCol();
         int currentRow = world.getActiveLetter().getRow();
-        if (currentColumn > 0 && !letterAlreadyExists(currentColumn - 1, currentRow, world)) {
+        if (currentColumn > 0 && !letterAlreadyExists(currentColumn - 1, currentRow)) {
             world.getActiveLetter().setCol(currentColumn - 1);
         }
     }
 
-    private void moveActiveLetterRight(World world) {
+    private void moveActiveLetterRight() {
         int currentColumn = world.getActiveLetter().getCol();
         int currentRow = world.getActiveLetter().getRow();
-        if (currentColumn < LETTER_COLUMN_COUNT - 1 && !letterAlreadyExists(currentColumn + 1, currentRow, world)) {
+        if (currentColumn < LETTER_COLUMN_COUNT - 1 && !letterAlreadyExists(currentColumn + 1, currentRow)) {
             world.getActiveLetter().setCol(currentColumn + 1);
         }
     }
 
-    private boolean letterAlreadyExists(int currentColumn, int currentRow, World world) {
+    private boolean letterAlreadyExists(int currentColumn, int currentRow) {
         Predicate<PositionLetter> positionMatches = l -> l.getCol() == currentColumn && l.getRow() == currentRow;
 
         if (world.getIncorrectLetters().stream().anyMatch(positionMatches)) {
@@ -105,7 +80,7 @@ public class LetterController implements CodeController {
         return false;
     }
 
-    private void updateActiveLetterRow(World world, float delta) {
+    private void updateActiveLetterRow(float delta) {
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             timeSinceLastLetterFall += delta * LETTER_FALL_SPEED_MULTIPLIER;
         } else {
@@ -115,8 +90,8 @@ public class LetterController implements CodeController {
         if (timeSinceLastLetterFall >= LETTER_FALL_SPEED) {
             PositionLetter activeLetter = world.getActiveLetter();
             int currentRow = activeLetter.getRow();
-            if (activeLetterWillHitBottom(currentRow) || activeLetterWillHitOtherLetter(world)) {
-                onActiveLetterHit(world);
+            if (activeLetterWillHitBottom(currentRow) || activeLetterWillHitOtherLetter()) {
+                onActiveLetterHit();
             } else {
                 activeLetter.setRow(currentRow - 1);
             }
@@ -124,10 +99,10 @@ public class LetterController implements CodeController {
         }
     }
 
-    private void initializeKeyLetters(World world) {
+    private void initializeKeyLetters() {
         ArrayList<KeyLetter> keyLetters = newArrayList();
 
-        List<LetterEnum> word = initializeWord(world);
+        List<LetterEnum> word = initializeWord();
         int startColumn = randomInt(LETTER_COLUMN_COUNT - word.size());
         int columnAfterEnd = startColumn + word.size();
 
@@ -148,7 +123,7 @@ public class LetterController implements CodeController {
         world.setKeyLetters(keyLetters);
     }
 
-    private List<LetterEnum> initializeWord(World world) {
+    private List<LetterEnum> initializeWord() {
         return newWord(RandomUtils.getNextValue(world.getWordList()));
     }
 
@@ -156,44 +131,44 @@ public class LetterController implements CodeController {
         return currentRow <= KEY_LETTER_ROW + 1;
     }
 
-    private boolean activeLetterWillHitOtherLetter(World world) {
-        return activeLetterWillHitCorrectLetter(world) || activeLetterWillHitIncorrectLetter(world);
+    private boolean activeLetterWillHitOtherLetter() {
+        return activeLetterWillHitCorrectLetter() || activeLetterWillHitIncorrectLetter();
     }
 
-    private boolean activeLetterWillHitCorrectLetter(World world) {
+    private boolean activeLetterWillHitCorrectLetter() {
         return world.getCorrectLetters().stream()
-                .anyMatch((letter) -> activeLetterWillHit(world, letter));
+                .anyMatch((letter) -> activeLetterWillHit(letter));
     }
 
-    private boolean activeLetterWillHitIncorrectLetter(World world) {
+    private boolean activeLetterWillHitIncorrectLetter() {
         return world.getIncorrectLetters().stream()
-                .anyMatch((letter) -> activeLetterWillHit(world, letter));
+                .anyMatch((letter) -> activeLetterWillHit(letter));
     }
 
-    private boolean activeLetterWillHit(World world, PositionLetter letter) {
+    private boolean activeLetterWillHit(PositionLetter letter) {
         return world.getActiveLetter().getCol() == letter.getCol() &&
                 world.getActiveLetter().getRow() <= letter.getRow() + 1;
     }
 
-    private void initializeActiveLetter(World world) {
-        List<LetterEnum> availableLetters = getAvailableLetters(world);
+    private void initializeActiveLetter() {
+        List<LetterEnum> availableLetters = getAvailableLetters();
 
         if (availableLetters.isEmpty()) {
-            initializeKeyLetters(world);
-            availableLetters = getAvailableLetters(world);
+            initializeKeyLetters();
+            availableLetters = getAvailableLetters();
         }
 
         world.setActiveLetter(new PositionLetter(randomInt(12), LETTER_ROW_COUNT + 1, getNextValue(availableLetters)));
     }
 
-    private List<LetterEnum> getAvailableLetters(World world) {
+    private List<LetterEnum> getAvailableLetters() {
         return world.getKeyLetters().stream()
                 .filter(KeyLetter::isNotSolved)
                 .map(KeyLetter::getValueLetter)
                 .collect(Collectors.toList());
     }
 
-    private void onActiveLetterHit(World world) {
+    private void onActiveLetterHit() {
         PositionLetter activeLetter = world.getActiveLetter();
         KeyLetter keyLetter = world.getKeyLetters().get(activeLetter.getCol());
 
@@ -202,7 +177,7 @@ public class LetterController implements CodeController {
         } else {
             world.getIncorrectLetters().add(activeLetter);
         }
-        initializeActiveLetter(world);
+        initializeActiveLetter();
     }
 
 }
