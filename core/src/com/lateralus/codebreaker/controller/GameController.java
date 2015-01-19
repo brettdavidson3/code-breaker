@@ -25,11 +25,13 @@ public class GameController implements CodeBreakerController {
     private static final float LETTER_FALL_SPEED = 0.4f;
     private static final float LETTER_FALL_SPEED_MULTIPLIER = 5f;
 
+    private MainController mainController;
     private float timeSinceLastLetterFall = 0f;
     private GameModel model;
     private InputListener inputListener;
 
     public GameController(MainController mainController, GameModel model) {
+        this.mainController = mainController;
         this.model = model;
         initializeKeyLetters();
         initializeActiveLetter();
@@ -171,7 +173,9 @@ public class GameController implements CodeBreakerController {
         PositionLetter activeLetter = model.getActiveLetter();
         KeyLetter keyLetter = model.getKeyLetters().get(activeLetter.getCol());
 
-        if (activeLetter.getValue().equals(keyLetter.getValueLetter())) {
+        if (activeLetter.getRow() == model.LETTER_ROW_COUNT) {
+            mainController.viewLoseScreen(model.getScore());
+        } else if (activeLetter.getValue().equals(keyLetter.getValueLetter())) {
             keyLetter.setSolved(true);
         } else {
             model.getIncorrectLetters().add(activeLetter);

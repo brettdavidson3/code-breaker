@@ -6,10 +6,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.lateralus.codebreaker.model.GameModel;
+import com.lateralus.codebreaker.model.LoseModel;
+import com.lateralus.codebreaker.model.MainModel;
 import com.lateralus.codebreaker.model.TitleModel;
 import com.lateralus.codebreaker.model.constant.Difficulty;
 import com.lateralus.codebreaker.model.screen.CodeBreakerScreen;
 import com.lateralus.codebreaker.view.GameView;
+import com.lateralus.codebreaker.view.LoseView;
 import com.lateralus.codebreaker.view.TitleView;
 import com.lateralus.codebreaker.view.render.LetterRenderer;
 
@@ -19,10 +22,12 @@ public class MainController implements Screen {
     private OrthographicCamera camera;
     private CodeBreakerScreen currentScreen;
     private LetterRenderer letterRenderer;
+    private MainModel mainModel;
 
     public MainController() {
         spriteBatch = new SpriteBatch();
         letterRenderer = new LetterRenderer();
+        mainModel = new MainModel(0); // TODO: save this to disk
         initViewport();
         viewTitleScreen();
     }
@@ -113,8 +118,16 @@ public class MainController implements Screen {
         currentScreen = new CodeBreakerScreen(model, view, controller);
     }
 
-    public void viewLoseScreen() {
+    public void viewLoseScreen(int score) {
+        if (score > mainModel.getHighScore()) {
+            mainModel.setHighScore(score);
+        }
 
+        LoseModel model = new LoseModel(score, mainModel.getHighScore());
+        LoseView view = new LoseView(model);
+        LoseController controller = new LoseController(this);
+
+        currentScreen = new CodeBreakerScreen(model, view, controller);
     }
 
 }

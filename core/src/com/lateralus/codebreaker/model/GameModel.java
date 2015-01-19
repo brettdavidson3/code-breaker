@@ -19,9 +19,11 @@ public class GameModel {
     private List<KeyLetter> keyLetters;
     private Difficulty difficulty;
     private List<String> wordList;
+    private int score;
 
     public GameModel(Difficulty difficulty) {
         setDifficulty(difficulty);
+        this.score = 0;
     }
 
     public PositionLetter getActiveLetter() {
@@ -67,5 +69,13 @@ public class GameModel {
 
     public List<String> getWordList() {
         return wordList;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }

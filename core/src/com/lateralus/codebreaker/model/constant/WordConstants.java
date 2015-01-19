@@ -1,19 +1,10 @@
 package com.lateralus.codebreaker.model.constant;
 
-import com.lateralus.codebreaker.model.letter.LetterEnum;
-
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.lateralus.codebreaker.model.letter.LetterEnum.newWord;
 
 public class WordConstants {
-
-    public static List<LetterEnum> WORD_CODE = newWord("code");
-    public static List<LetterEnum> WORD_BREAKER = newWord("breaker");
-    public static List<LetterEnum> WORD_EASY = newWord("easy");
-    public static List<LetterEnum> WORD_NORMAL = newWord("normal");
-    public static List<LetterEnum> WORD_HARD = newWord("hard");
 
     public static List<String> getWordList(Difficulty difficulty) {
         switch (difficulty) {

@@ -5,12 +5,19 @@ import com.lateralus.codebreaker.model.constant.Difficulty;
 import com.lateralus.codebreaker.model.letter.LetterEnum;
 import com.lateralus.codebreaker.view.render.LetterRenderer;
 
+import java.util.List;
+
 import static com.lateralus.codebreaker.model.constant.Difficulty.*;
-import static com.lateralus.codebreaker.model.constant.WordConstants.*;
+import static com.lateralus.codebreaker.model.letter.LetterEnum.newWord;
 
 public class TitleView implements CodeBreakerView {
 
     private static final int DIFFICULTY_LIST_START_ROW = 12;
+    public static final List<LetterEnum> WORD_CODE = newWord("code");
+    public static final List<LetterEnum> WORD_BREAKER = newWord("breaker");
+    public static final List<LetterEnum> WORD_EASY = newWord("easy");
+    public static final List<LetterEnum> WORD_NORMAL = newWord("normal");
+    public static final List<LetterEnum> WORD_HARD = newWord("hard");
 
     private final TitleModel model;
 
