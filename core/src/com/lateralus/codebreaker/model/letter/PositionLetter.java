@@ -1,4 +1,4 @@
-package com.lateralus.codebreaker.model;
+package com.lateralus.codebreaker.model.letter;
 
 import static com.lateralus.codebreaker.util.RandomUtils.randomInt;
 

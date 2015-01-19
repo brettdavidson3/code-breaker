@@ -1,15 +1,17 @@
 package com.lateralus.codebreaker.model;
 
+import com.lateralus.codebreaker.model.constant.Difficulty;
+import com.lateralus.codebreaker.model.constant.WordConstants;
+import com.lateralus.codebreaker.model.letter.KeyLetter;
+import com.lateralus.codebreaker.model.letter.PositionLetter;
+
 import java.util.List;
 
-public class World {
+public class GameModel {
 
     public static final int LETTER_COLUMN_COUNT = 12;
     public static final int LETTER_ROW_COUNT = 17;
     public static final int KEY_LETTER_ROW = 0;
-
-    public enum Screen { Title, Game, Lose }
-    public enum Difficulty { Easy, Normal, Hard }
 
     private PositionLetter activeLetter;
     private List<PositionLetter> correctLetters;
@@ -17,11 +19,9 @@ public class World {
     private List<KeyLetter> keyLetters;
     private Difficulty difficulty;
     private List<String> wordList;
-    private Screen screen;
 
-    public World() {
-        screen = Screen.Title;
-        setDifficulty(Difficulty.Normal);
+    public GameModel(Difficulty difficulty) {
+        setDifficulty(difficulty);
     }
 
     public PositionLetter getActiveLetter() {
@@ -67,13 +67,5 @@ public class World {
 
     public List<String> getWordList() {
         return wordList;
-    }
-
-    public Screen getScreen() {
-        return screen;
-    }
-
-    public void setScreen(Screen screen) {
-        this.screen = screen;
     }
 }

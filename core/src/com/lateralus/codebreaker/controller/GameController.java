@@ -3,10 +3,10 @@ package com.lateralus.codebreaker.controller;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.lateralus.codebreaker.controller.input.InputListener;
-import com.lateralus.codebreaker.model.KeyLetter;
-import com.lateralus.codebreaker.model.LetterEnum;
-import com.lateralus.codebreaker.model.PositionLetter;
-import com.lateralus.codebreaker.model.World;
+import com.lateralus.codebreaker.model.letter.KeyLetter;
+import com.lateralus.codebreaker.model.letter.LetterEnum;
+import com.lateralus.codebreaker.model.letter.PositionLetter;
+import com.lateralus.codebreaker.model.GameModel;
 import com.lateralus.codebreaker.util.RandomUtils;
 
 import java.util.ArrayList;
@@ -15,27 +15,26 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.lateralus.codebreaker.model.LetterEnum.newWord;
-import static com.lateralus.codebreaker.model.World.*;
+import static com.lateralus.codebreaker.model.letter.LetterEnum.newWord;
+import static com.lateralus.codebreaker.model.GameModel.*;
 import static com.lateralus.codebreaker.util.RandomUtils.getNextValue;
 import static com.lateralus.codebreaker.util.RandomUtils.randomInt;
 
-public class LetterController implements CodeController {
+public class GameController implements CodeBreakerController {
 
     private static final float LETTER_FALL_SPEED = 0.4f;
     private static final float LETTER_FALL_SPEED_MULTIPLIER = 5f;
 
     private float timeSinceLastLetterFall = 0f;
-    private World world;
+    private GameModel model;
     private InputListener inputListener;
 
-    @Override
-    public void initialize(World world) {
-        this.world = world;
+    public GameController(MainController mainController, GameModel model) {
+        this.model = model;
         initializeKeyLetters();
         initializeActiveLetter();
-        world.setCorrectLetters(newArrayList());
-        world.setIncorrectLetters(newArrayList());
+        model.setCorrectLetters(newArrayList());
+        model.setIncorrectLetters(newArrayList());
         initializeInputListener();
     }
 
@@ -52,28 +51,28 @@ public class LetterController implements CodeController {
     }
 
     private void moveActiveLetterLeft() {
-        int currentColumn = world.getActiveLetter().getCol();
-        int currentRow = world.getActiveLetter().getRow();
+        int currentColumn = model.getActiveLetter().getCol();
+        int currentRow = model.getActiveLetter().getRow();
         if (currentColumn > 0 && !letterAlreadyExists(currentColumn - 1, currentRow)) {
-            world.getActiveLetter().setCol(currentColumn - 1);
+            model.getActiveLetter().setCol(currentColumn - 1);
         }
     }
 
     private void moveActiveLetterRight() {
-        int currentColumn = world.getActiveLetter().getCol();
-        int currentRow = world.getActiveLetter().getRow();
+        int currentColumn = model.getActiveLetter().getCol();
+        int currentRow = model.getActiveLetter().getRow();
         if (currentColumn < LETTER_COLUMN_COUNT - 1 && !letterAlreadyExists(currentColumn + 1, currentRow)) {
-            world.getActiveLetter().setCol(currentColumn + 1);
+            model.getActiveLetter().setCol(currentColumn + 1);
         }
     }
 
     private boolean letterAlreadyExists(int currentColumn, int currentRow) {
         Predicate<PositionLetter> positionMatches = l -> l.getCol() == currentColumn && l.getRow() == currentRow;
 
-        if (world.getIncorrectLetters().stream().anyMatch(positionMatches)) {
+        if (model.getIncorrectLetters().stream().anyMatch(positionMatches)) {
             return true;
         }
-        if (world.getCorrectLetters().stream().anyMatch(positionMatches)) {
+        if (model.getCorrectLetters().stream().anyMatch(positionMatches)) {
             return true;
         }
 
@@ -88,7 +87,7 @@ public class LetterController implements CodeController {
         }
 
         if (timeSinceLastLetterFall >= LETTER_FALL_SPEED) {
-            PositionLetter activeLetter = world.getActiveLetter();
+            PositionLetter activeLetter = model.getActiveLetter();
             int currentRow = activeLetter.getRow();
             if (activeLetterWillHitBottom(currentRow) || activeLetterWillHitOtherLetter()) {
                 onActiveLetterHit();
@@ -120,11 +119,11 @@ public class LetterController implements CodeController {
             keyLetters.add(new KeyLetter(availableKeys, LetterEnum.BLANK));
         }
 
-        world.setKeyLetters(keyLetters);
+        model.setKeyLetters(keyLetters);
     }
 
     private List<LetterEnum> initializeWord() {
-        return newWord(RandomUtils.getNextValue(world.getWordList()));
+        return newWord(RandomUtils.getNextValue(model.getWordList()));
     }
 
     private boolean activeLetterWillHitBottom(int currentRow) {
@@ -136,18 +135,18 @@ public class LetterController implements CodeController {
     }
 
     private boolean activeLetterWillHitCorrectLetter() {
-        return world.getCorrectLetters().stream()
+        return model.getCorrectLetters().stream()
                 .anyMatch((letter) -> activeLetterWillHit(letter));
     }
 
     private boolean activeLetterWillHitIncorrectLetter() {
-        return world.getIncorrectLetters().stream()
+        return model.getIncorrectLetters().stream()
                 .anyMatch((letter) -> activeLetterWillHit(letter));
     }
 
     private boolean activeLetterWillHit(PositionLetter letter) {
-        return world.getActiveLetter().getCol() == letter.getCol() &&
-                world.getActiveLetter().getRow() <= letter.getRow() + 1;
+        return model.getActiveLetter().getCol() == letter.getCol() &&
+                model.getActiveLetter().getRow() <= letter.getRow() + 1;
     }
 
     private void initializeActiveLetter() {
@@ -158,24 +157,24 @@ public class LetterController implements CodeController {
             availableLetters = getAvailableLetters();
         }
 
-        world.setActiveLetter(new PositionLetter(randomInt(12), LETTER_ROW_COUNT + 1, getNextValue(availableLetters)));
+        model.setActiveLetter(new PositionLetter(randomInt(12), LETTER_ROW_COUNT + 1, getNextValue(availableLetters)));
     }
 
     private List<LetterEnum> getAvailableLetters() {
-        return world.getKeyLetters().stream()
+        return model.getKeyLetters().stream()
                 .filter(KeyLetter::isNotSolved)
                 .map(KeyLetter::getValueLetter)
                 .collect(Collectors.toList());
     }
 
     private void onActiveLetterHit() {
-        PositionLetter activeLetter = world.getActiveLetter();
-        KeyLetter keyLetter = world.getKeyLetters().get(activeLetter.getCol());
+        PositionLetter activeLetter = model.getActiveLetter();
+        KeyLetter keyLetter = model.getKeyLetters().get(activeLetter.getCol());
 
         if (activeLetter.getValue().equals(keyLetter.getValueLetter())) {
             keyLetter.setSolved(true);
         } else {
-            world.getIncorrectLetters().add(activeLetter);
+            model.getIncorrectLetters().add(activeLetter);
         }
         initializeActiveLetter();
     }

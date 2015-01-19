@@ -2,16 +2,17 @@ package com.lateralus.codebreaker.controller;
 
 import com.badlogic.gdx.Input;
 import com.lateralus.codebreaker.controller.input.InputListener;
-import com.lateralus.codebreaker.model.World;
+import com.lateralus.codebreaker.model.TitleModel;
 
-public class TitleController implements CodeController {
+public class TitleController implements CodeBreakerController {
 
-    private World world;
+    private MainController mainController;
+    private TitleModel model;
     private InputListener inputListener;
 
-    @Override
-    public void initialize(World world) {
-        this.world = world;
+    public TitleController(MainController mainController, TitleModel model) {
+        this.mainController = mainController;
+        this.model = model;
         initializeInputListener();
     }
 
@@ -28,22 +29,14 @@ public class TitleController implements CodeController {
     }
 
     private void onUpPressed() {
-        switch (world.getDifficulty()) {
-            case Easy:      world.setDifficulty(World.Difficulty.Hard);break;
-            case Normal:    world.setDifficulty(World.Difficulty.Easy);break;
-            case Hard:      world.setDifficulty(World.Difficulty.Normal);break;
-        }
+        model.setDifficulty(model.getDifficulty().getPrevious());
     }
 
     private void onDownPressed() {
-        switch (world.getDifficulty()) {
-            case Easy:      world.setDifficulty(World.Difficulty.Normal);break;
-            case Normal:    world.setDifficulty(World.Difficulty.Hard);break;
-            case Hard:      world.setDifficulty(World.Difficulty.Easy);break;
-        }
+        model.setDifficulty(model.getDifficulty().getNext());
     }
 
     private void onEnterPressed() {
-        world.setScreen(World.Screen.Game);
+        mainController.viewGameScreen(model.getDifficulty());
     }
 }

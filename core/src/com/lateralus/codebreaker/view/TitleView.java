@@ -1,0 +1,43 @@
+package com.lateralus.codebreaker.view;
+
+import com.lateralus.codebreaker.model.TitleModel;
+import com.lateralus.codebreaker.model.constant.Difficulty;
+import com.lateralus.codebreaker.model.letter.LetterEnum;
+import com.lateralus.codebreaker.view.render.LetterRenderer;
+
+import static com.lateralus.codebreaker.model.constant.Difficulty.*;
+import static com.lateralus.codebreaker.model.constant.WordConstants.*;
+
+public class TitleView implements CodeBreakerView {
+
+    private static final int DIFFICULTY_LIST_START_ROW = 12;
+
+    private final TitleModel model;
+
+    public TitleView(TitleModel model) {
+        this.model = model;
+    }
+
+    @Override
+    public void render(LetterRenderer letterRenderer) {
+        letterRenderer.useGold();
+        letterRenderer.drawCenteredWords(15, WORD_CODE, WORD_BREAKER);
+
+        letterRenderer.useWhite();
+        letterRenderer.drawCenteredWords(getRow(Easy), WORD_EASY);
+
+        int rightIndicatorCol = letterRenderer.drawCenteredWords(getRow(Normal), WORD_NORMAL);
+        int leftIndicatorCol = rightIndicatorCol - WORD_NORMAL.size() - 1;
+
+        letterRenderer.drawCenteredWords(getRow(Hard), WORD_HARD);
+
+        letterRenderer.useGold();
+        int indicatorRow = getRow(model.getDifficulty());
+        letterRenderer.drawLetter(rightIndicatorCol, indicatorRow, LetterEnum.A);
+        letterRenderer.drawLetter(leftIndicatorCol, indicatorRow, LetterEnum.A);
+    }
+
+    private int getRow(Difficulty difficulty) {
+        return DIFFICULTY_LIST_START_ROW - difficulty.ordinal();
+    }
+}
