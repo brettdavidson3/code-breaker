@@ -22,9 +22,9 @@ public class LetterRenderer {
     private TextureRegion[] greenTextures;
     private TextureRegion[] whiteTextures;
     private TextureRegion[] goldTextures;
-    private TextureRegion[] blueCodeTextures;
     private TextureRegion[] grayCodeTextures;
-    private TextureRegion[] specialTextures;
+    private TextureRegion[] blueCodeTextures;
+    private TextureRegion[] whiteNumberTextures;
     private TextureRegion[] currentTextures;
     private Texture letterTexture;
     private float timeSinceLastRandomLetters = 0f;
@@ -69,8 +69,8 @@ public class LetterRenderer {
         currentTextures = grayCodeTextures;
     }
 
-    public void useSpecial() {
-        currentTextures = specialTextures;
+    public void useWhiteNumbers() {
+        currentTextures = whiteNumberTextures;
     }
 
     private void cycleRandomNumbers(float delta) {
@@ -82,10 +82,10 @@ public class LetterRenderer {
     }
 
     private void resetSprites() {
-        for (int col = 0; col < getSpriteGridColumnCount(); col++) {
-            for (int row = 0; row < getSpriteGridRowCount(); row++) {
-                Sprite currentSprite = sprites[col][row];
-                updateBackgroundSprite(currentSprite, col, row);
+        useGrayCode();
+        for (int col = 0; col < LETTER_COLUMN_COUNT; col++) {
+            for (int row = 0; row < LETTER_ROW_COUNT; row++) {
+                drawLetter(randomLetters[col][row]);
             }
         }
     }
@@ -115,15 +115,19 @@ public class LetterRenderer {
         return col;
     }
 
+    public void drawLetter(PositionLetter letter) {
+        drawLetter(letter.getCol(), letter.getRow(), letter.getValue());
+    }
+
     public void drawLetter(int col, int row, LetterEnum letter) {
         sprites[col][row].setRegion(currentTextures[letter.getIndex()]);
     }
 
     private void initializeSprites() {
-        sprites = new Sprite[getSpriteGridColumnCount()][getSpriteGridRowCount()];
+        sprites = new Sprite[LETTER_COLUMN_COUNT][LETTER_ROW_COUNT];
 
-        for (int col = 0; col < getSpriteGridColumnCount(); col++) {
-            for (int row = 0; row < getSpriteGridRowCount(); row++) {
+        for (int col = 0; col < LETTER_COLUMN_COUNT; col++) {
+            for (int row = 0; row < LETTER_ROW_COUNT; row++) {
                 Sprite currentSprite = new Sprite(letterTexture, 0, 0, LETTER_SIZE, LETTER_SIZE);
                 currentSprite.setPosition(col * LETTER_SIZE, row * LETTER_SIZE);
                 sprites[col][row] = currentSprite;
@@ -131,66 +135,45 @@ public class LetterRenderer {
         }
     }
 
-    private int getSpriteGridRowCount() {
-        return LETTER_ROW_COUNT + 3;
-    }
-
-    private int getSpriteGridColumnCount() {
-        return LETTER_COLUMN_COUNT;
-    }
-
     private void initalizeTextures() {
-        greenTextures = new TextureRegion[26];
-        for (int i = 0; i < 26; i++) {
-            greenTextures[i] = getLetterTextureRegion(i, 0);
-        }
+        int size = LetterEnum.values().length;
+        greenTextures = new TextureRegion[size];
+        whiteTextures = new TextureRegion[size];
+        goldTextures = new TextureRegion[size];
+        grayCodeTextures = new TextureRegion[size];
+        blueCodeTextures = new TextureRegion[size];
+        whiteNumberTextures = new TextureRegion[size];
 
-        whiteTextures = new TextureRegion[26];
-        for (int i = 0; i < 26; i++) {
-            whiteTextures[i] = getLetterTextureRegion(i, 1);
-        }
+        initializeTexturesAtRow(0, greenTextures);
+        initializeTexturesAtRow(1, whiteTextures);
+        initializeTexturesAtRow(2, goldTextures);
+        initializeTexturesAtRow(3, grayCodeTextures);
+        initializeTexturesAtRow(4, blueCodeTextures);
+        // 5 - TODO: clean up sprite
+        initializeTexturesAtRow(6, whiteNumberTextures);
+    }
 
-        goldTextures = new TextureRegion[26];
-        for (int i = 0; i < 26; i++) {
-            goldTextures[i] = getLetterTextureRegion(i, 2);
+    private void initializeTexturesAtRow(int row, TextureRegion[] textures) {
+        for (int i = 0; i < LetterEnum.values().length; i++) {
+            textures[i] = getLetterTextureRegion(i, row);
         }
-
-        grayCodeTextures = new TextureRegion[26];
-        for (int i = 0; i < 26; i++) {
-            grayCodeTextures[i] = getLetterTextureRegion(i, 3);
-        }
-
-        blueCodeTextures = new TextureRegion[26];
-        for (int i = 0; i < 26; i++) {
-            blueCodeTextures[i] = getLetterTextureRegion(i, 4);
-        }
-
-        specialTextures = new TextureRegion[26];
-        for (int i = 0; i < 26; i++) {
-            specialTextures[i] = getLetterTextureRegion(i, 6);
-        }
-
     }
 
     private void initializeRandomLetters() {
-        randomLetters = new PositionLetter[getSpriteGridColumnCount()][getSpriteGridRowCount()];
+        randomLetters = new PositionLetter[LETTER_COLUMN_COUNT][LETTER_ROW_COUNT];
         randomizeBackgroundLetters();
     }
 
     private void randomizeBackgroundLetters() {
-        for (int col = 0; col < getSpriteGridColumnCount(); col++) {
-            for (int row = 0; row < getSpriteGridRowCount(); row++) {
+        for (int col = 0; col < LETTER_COLUMN_COUNT; col++) {
+            for (int row = 0; row < LETTER_ROW_COUNT; row++) {
                 randomLetters[col][row] = new PositionLetter(col, row);
             }
         }
     }
 
-    private TextureRegion getLetterTextureRegion(int row, int col) {
-        return new TextureRegion(letterTexture, row * 90, col * 90, 90, 90);
-    }
-
-    private void updateBackgroundSprite(Sprite currentSprite, int col, int row) {
-        currentSprite.setRegion(grayCodeTextures[randomLetters[col][row].getValue().getIndex()]);
+    private TextureRegion getLetterTextureRegion(int col, int row) {
+        return new TextureRegion(letterTexture, col * 90, row * 90, 90, 90);
     }
 
 }

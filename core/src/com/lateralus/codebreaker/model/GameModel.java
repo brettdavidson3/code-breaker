@@ -10,8 +10,9 @@ import java.util.List;
 public class GameModel {
 
     public static final int LETTER_COLUMN_COUNT = 12;
-    public static final int LETTER_ROW_COUNT = 17;
-    public static final int KEY_LETTER_ROW = 0;
+    public static final int LETTER_ROW_COUNT = 20;
+
+    public static int getTopRow() { return LETTER_ROW_COUNT - 1; }
 
     private PositionLetter activeLetter;
     private List<PositionLetter> correctLetters;

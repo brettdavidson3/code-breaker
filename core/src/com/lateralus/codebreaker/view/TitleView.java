@@ -40,8 +40,8 @@ public class TitleView implements CodeBreakerView {
 
         letterRenderer.useGold();
         int indicatorRow = getRow(model.getDifficulty());
-        letterRenderer.drawLetter(rightIndicatorCol, indicatorRow, LetterEnum.A);
-        letterRenderer.drawLetter(leftIndicatorCol, indicatorRow, LetterEnum.A);
+        letterRenderer.drawLetter(rightIndicatorCol, indicatorRow, LetterEnum.BLANK);
+        letterRenderer.drawLetter(leftIndicatorCol, indicatorRow, LetterEnum.BLANK);
     }
 
     private int getRow(Difficulty difficulty) {

@@ -129,7 +129,7 @@ public class GameController implements CodeBreakerController {
     }
 
     private boolean activeLetterWillHitBottom(int currentRow) {
-        return currentRow <= KEY_LETTER_ROW + 1;
+        return currentRow <= 1;
     }
 
     private boolean activeLetterWillHitOtherLetter() {
@@ -159,7 +159,7 @@ public class GameController implements CodeBreakerController {
             availableLetters = getAvailableLetters();
         }
 
-        model.setActiveLetter(new PositionLetter(randomInt(12), LETTER_ROW_COUNT + 1, getNextValue(availableLetters)));
+        model.setActiveLetter(new PositionLetter(randomInt(12), getTopRow(), getNextValue(availableLetters)));
     }
 
     private List<LetterEnum> getAvailableLetters() {
@@ -173,9 +173,9 @@ public class GameController implements CodeBreakerController {
         PositionLetter activeLetter = model.getActiveLetter();
         KeyLetter keyLetter = model.getKeyLetters().get(activeLetter.getCol());
 
-        if (activeLetter.getRow() == model.LETTER_ROW_COUNT) {
+        if (activeLetter.getRow() == getTopRow()) {
             mainController.viewLoseScreen(model.getScore());
-        } else if (activeLetter.getValue().equals(keyLetter.getValueLetter())) {
+        } else if (activeLetter.getValue().equals(keyLetter.getValueLetter()) && keyLetter.isNotSolved()) {
             keyLetter.setSolved(true);
         } else {
             model.getIncorrectLetters().add(activeLetter);
