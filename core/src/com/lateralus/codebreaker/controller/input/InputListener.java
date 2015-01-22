@@ -23,10 +23,16 @@ public class InputListener {
 
     public void addPressListener(int key, Runnable action) {
         pressListeners.put(key, action);
+        if (Gdx.input.isKeyPressed(key)) {
+            currentKeyPressed = key;
+        }
     }
 
     public void addHoldListener(int key, Runnable action) {
         holdListeners.put(key, action);
+        if (Gdx.input.isKeyPressed(key)) {
+            currentKeyHeld = key;
+        }
     }
 
     public void checkInput(float delta) {

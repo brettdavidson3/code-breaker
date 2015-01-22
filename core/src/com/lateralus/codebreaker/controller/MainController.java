@@ -27,7 +27,7 @@ public class MainController implements Screen {
     public MainController() {
         spriteBatch = new SpriteBatch();
         letterRenderer = new LetterRenderer();
-        mainModel = new MainModel(0); // TODO: save this to disk
+        mainModel = new MainModel(10); // TODO: save this to disk
         initViewport();
         viewTitleScreen();
     }
