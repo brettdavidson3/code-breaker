@@ -42,8 +42,8 @@ public class GameController implements CodeBreakerController {
 
     private void initializeInputListener() {
         inputListener = new InputListener();
-        inputListener.addKeyListener(Input.Keys.LEFT, this::moveActiveLetterLeft);
-        inputListener.addKeyListener(Input.Keys.RIGHT, this::moveActiveLetterRight);
+        inputListener.addHoldListener(Input.Keys.LEFT, this::moveActiveLetterLeft);
+        inputListener.addHoldListener(Input.Keys.RIGHT, this::moveActiveLetterRight);
     }
 
     @Override

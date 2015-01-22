@@ -23,9 +23,9 @@ public class TitleController implements CodeBreakerController {
 
     private void initializeInputListener() {
         this.inputListener = new InputListener();
-        inputListener.addKeyListener(Input.Keys.UP, this::onUpPressed);
-        inputListener.addKeyListener(Input.Keys.DOWN, this::onDownPressed);
-        inputListener.addKeyListener(Input.Keys.ENTER, this::onEnterPressed);
+        inputListener.addPressListener(Input.Keys.UP, this::onUpPressed);
+        inputListener.addPressListener(Input.Keys.DOWN, this::onDownPressed);
+        inputListener.addPressListener(Input.Keys.ENTER, this::onEnterPressed);
     }
 
     private void onUpPressed() {
