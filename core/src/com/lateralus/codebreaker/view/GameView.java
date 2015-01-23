@@ -2,13 +2,18 @@ package com.lateralus.codebreaker.view;
 
 import com.lateralus.codebreaker.model.GameModel;
 import com.lateralus.codebreaker.model.letter.KeyLetter;
-import com.lateralus.codebreaker.model.letter.PositionLetter;
+import com.lateralus.codebreaker.model.letter.LetterEnum;
 import com.lateralus.codebreaker.view.render.LetterRenderer;
 
-import static com.lateralus.codebreaker.model.GameModel.LETTER_COLUMN_COUNT;
+import java.util.List;
+
+import static com.lateralus.codebreaker.model.letter.LetterEnum.newWord;
+import static com.lateralus.codebreaker.view.render.LetterRenderer.LETTER_COLUMN_COUNT;
+import static com.lateralus.codebreaker.view.render.LetterRenderer.LETTER_ROW_COUNT;
 
 public class GameView implements CodeBreakerView {
 
+    public static final List<LetterEnum> WORD_SCORE = newWord("score");
     private GameModel model;
 
     public GameView(GameModel model) {
@@ -17,17 +22,26 @@ public class GameView implements CodeBreakerView {
 
     @Override
     public void render(LetterRenderer letterRenderer) {
-        updateActiveSprite(letterRenderer);
-        updateKeySprites(letterRenderer);
-        updateIncorrectSprites(letterRenderer);
+        renderScore(letterRenderer);
+        renderActiveSprite(letterRenderer);
+        renderKeySprites(letterRenderer);
+        renderIncorrectSprites(letterRenderer);
     }
 
-    private void updateActiveSprite(LetterRenderer letterRenderer) {
+    private void renderScore(LetterRenderer letterRenderer) {
+        letterRenderer.useWhite();
+        letterRenderer.drawLeftAlignedWord(LETTER_ROW_COUNT - 1, WORD_SCORE);
+
+        letterRenderer.useWhiteNumbers();
+        letterRenderer.drawRightAlignedNumber(LETTER_ROW_COUNT - 1, model.getScore());
+    }
+
+    private void renderActiveSprite(LetterRenderer letterRenderer) {
         letterRenderer.useGreen();
         letterRenderer.drawLetter(model.getActiveLetter());
     }
 
-    private void updateKeySprites(LetterRenderer letterRenderer) {
+    private void renderKeySprites(LetterRenderer letterRenderer) {
         for (int col = 0; col < LETTER_COLUMN_COUNT; col++) {
             KeyLetter currentKeyLetter = model.getKeyLetters().get(col);
 
@@ -41,7 +55,7 @@ public class GameView implements CodeBreakerView {
         }
     }
 
-    private void updateIncorrectSprites(LetterRenderer letterRenderer) {
+    private void renderIncorrectSprites(LetterRenderer letterRenderer) {
         letterRenderer.useWhite();
         model.getIncorrectLetters().forEach(letterRenderer::drawLetter);
     }

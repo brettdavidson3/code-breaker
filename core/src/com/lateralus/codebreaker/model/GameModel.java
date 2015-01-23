@@ -4,15 +4,13 @@ import com.lateralus.codebreaker.model.constant.Difficulty;
 import com.lateralus.codebreaker.model.constant.WordConstants;
 import com.lateralus.codebreaker.model.letter.KeyLetter;
 import com.lateralus.codebreaker.model.letter.PositionLetter;
+import com.lateralus.codebreaker.view.render.LetterRenderer;
 
 import java.util.List;
 
 public class GameModel {
 
-    public static final int LETTER_COLUMN_COUNT = 12;
-    public static final int LETTER_ROW_COUNT = 20;
-
-    public static int getTopRow() { return LETTER_ROW_COUNT - 1; }
+    public static int getTopRow() { return LetterRenderer.GAME_AREA_ROW_COUNT - 1; }
 
     private PositionLetter activeLetter;
     private List<PositionLetter> correctLetters;
@@ -24,7 +22,7 @@ public class GameModel {
 
     public GameModel(Difficulty difficulty) {
         setDifficulty(difficulty);
-        this.score = 0;
+        this.score = 1234;
     }
 
     public PositionLetter getActiveLetter() {

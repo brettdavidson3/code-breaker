@@ -10,11 +10,11 @@ import com.lateralus.codebreaker.model.letter.PositionLetter;
 
 import java.util.List;
 
-import static com.lateralus.codebreaker.model.GameModel.LETTER_COLUMN_COUNT;
-import static com.lateralus.codebreaker.model.GameModel.LETTER_ROW_COUNT;
-
 public class LetterRenderer {
 
+    public static final int LETTER_COLUMN_COUNT = 12;
+    public static final int LETTER_ROW_COUNT = 21;
+    public static final int GAME_AREA_ROW_COUNT = 19;
     private static final int LETTER_SIZE = 90;
 
     private Sprite[][] sprites;
@@ -82,10 +82,15 @@ public class LetterRenderer {
     }
 
     private void resetSprites() {
-        useGrayCode();
         for (int col = 0; col < LETTER_COLUMN_COUNT; col++) {
-            for (int row = 0; row < LETTER_ROW_COUNT; row++) {
+            useGrayCode();
+            for (int row = 0; row < GAME_AREA_ROW_COUNT; row++) {
                 drawLetter(randomLetters[col][row]);
+            }
+
+            useWhiteNumbers();
+            for (int row = GAME_AREA_ROW_COUNT; row < LETTER_ROW_COUNT; row++) {
+                drawLetter(col, row, LetterEnum.BLANK);  // TODO - this location may move
             }
         }
     }
@@ -101,6 +106,10 @@ public class LetterRenderer {
             col = drawWord(col, row, word) + 1;
         }
         return col - 1;
+    }
+
+    public void drawLeftAlignedWord(int row, List<LetterEnum> word) {
+        drawWord(0, row, word);
     }
 
     private int getFirstColumnForCenteredWord(int wordLength) {
@@ -120,7 +129,20 @@ public class LetterRenderer {
     }
 
     public void drawLetter(int col, int row, LetterEnum letter) {
-        sprites[col][row].setRegion(currentTextures[letter.getIndex()]);
+        sprites[col][row].setRegion(currentTextures[letter.ordinal()]);
+    }
+
+    public void drawRightAlignedNumber(int row, int number) {
+        int col = LETTER_COLUMN_COUNT - 1;
+        int powerOfTen = 1;
+        while (number >= powerOfTen - 1) {
+            drawDigit(col--, row, (number % (powerOfTen * 10)) / powerOfTen);
+            powerOfTen *= 10;
+        }
+    }
+
+    public void drawDigit(int col, int row, int digit) {
+        sprites[col][row].setRegion(currentTextures[digit]);
     }
 
     private void initializeSprites() {
@@ -160,13 +182,13 @@ public class LetterRenderer {
     }
 
     private void initializeRandomLetters() {
-        randomLetters = new PositionLetter[LETTER_COLUMN_COUNT][LETTER_ROW_COUNT];
+        randomLetters = new PositionLetter[LETTER_COLUMN_COUNT][GAME_AREA_ROW_COUNT];
         randomizeBackgroundLetters();
     }
 
     private void randomizeBackgroundLetters() {
         for (int col = 0; col < LETTER_COLUMN_COUNT; col++) {
-            for (int row = 0; row < LETTER_ROW_COUNT; row++) {
+            for (int row = 0; row < GAME_AREA_ROW_COUNT; row++) {
                 randomLetters[col][row] = new PositionLetter(col, row);
             }
         }

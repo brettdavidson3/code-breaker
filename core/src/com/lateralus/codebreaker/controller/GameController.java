@@ -8,6 +8,7 @@ import com.lateralus.codebreaker.model.letter.LetterEnum;
 import com.lateralus.codebreaker.model.letter.PositionLetter;
 import com.lateralus.codebreaker.model.GameModel;
 import com.lateralus.codebreaker.util.RandomUtils;
+import com.lateralus.codebreaker.view.render.LetterRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class GameController implements CodeBreakerController {
     private void moveActiveLetterRight() {
         int currentColumn = model.getActiveLetter().getCol();
         int currentRow = model.getActiveLetter().getRow();
-        if (currentColumn < LETTER_COLUMN_COUNT - 1 && !letterAlreadyExists(currentColumn + 1, currentRow)) {
+        if (currentColumn < LetterRenderer.LETTER_COLUMN_COUNT - 1 && !letterAlreadyExists(currentColumn + 1, currentRow)) {
             model.getActiveLetter().setCol(currentColumn + 1);
         }
     }
@@ -104,7 +105,7 @@ public class GameController implements CodeBreakerController {
         ArrayList<KeyLetter> keyLetters = newArrayList();
 
         List<LetterEnum> word = initializeWord();
-        int startColumn = randomInt(LETTER_COLUMN_COUNT - word.size());
+        int startColumn = randomInt(LetterRenderer.LETTER_COLUMN_COUNT - word.size());
         int columnAfterEnd = startColumn + word.size();
 
         List<LetterEnum> availableKeys = LetterEnum.allLetters();
@@ -117,7 +118,7 @@ public class GameController implements CodeBreakerController {
             keyLetters.add(new KeyLetter(availableKeys, word.get(i - startColumn)));
         }
 
-        for (int i = columnAfterEnd; i < LETTER_COLUMN_COUNT; i++) {
+        for (int i = columnAfterEnd; i < LetterRenderer.LETTER_COLUMN_COUNT; i++) {
             keyLetters.add(new KeyLetter(availableKeys, LetterEnum.BLANK));
         }
 
