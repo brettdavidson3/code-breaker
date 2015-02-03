@@ -49,21 +49,21 @@ public class LoseView implements CodeBreakerView{
         letterRenderer.drawCenteredWords(9, WORD_NEW);
         letterRenderer.drawCenteredWords(8, WORD_HIGH, WORD_SCORE);
 
-        letterRenderer.useWhite();
-        letterRenderer.drawCenteredWords(7, newWord("abcdef"));
+        letterRenderer.useWhiteNumbers();
+        letterRenderer.drawRightAlignedNumber(7, model.getScore());
     }
 
     private void renderNormalScoreText(LetterRenderer letterRenderer) {
         letterRenderer.useGold();
         letterRenderer.drawCenteredWords(9, WORD_YOUR, WORD_SCORE);
 
-        letterRenderer.useWhite();
-        letterRenderer.drawCenteredWords(8, newWord("ghijkl"));
+        letterRenderer.useWhiteNumbers();
+        letterRenderer.drawRightAlignedNumber(8, model.getScore());
 
         letterRenderer.useGold();
         letterRenderer.drawCenteredWords(6, WORD_HIGH, WORD_SCORE);
 
-        letterRenderer.useWhite();
-        letterRenderer.drawCenteredWords(5, newWord("mnopqr"));
+        letterRenderer.useWhiteNumbers();
+        letterRenderer.drawRightAlignedNumber(5, model.getHighScore());
     }
 }

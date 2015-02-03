@@ -13,7 +13,6 @@ public class GameModel {
     public static int getTopRow() { return LetterRenderer.GAME_AREA_ROW_COUNT - 1; }
 
     private PositionLetter activeLetter;
-    private List<PositionLetter> correctLetters;
     private List<PositionLetter> incorrectLetters;
     private List<KeyLetter> keyLetters;
     private Difficulty difficulty;
@@ -22,7 +21,7 @@ public class GameModel {
 
     public GameModel(Difficulty difficulty) {
         setDifficulty(difficulty);
-        this.score = 1234;
+        this.score = 0;
     }
 
     public PositionLetter getActiveLetter() {
@@ -39,14 +38,6 @@ public class GameModel {
 
     public void setKeyLetters(List<KeyLetter> keyLetters) {
         this.keyLetters = keyLetters;
-    }
-
-    public List<PositionLetter> getCorrectLetters() {
-        return correctLetters;
-    }
-
-    public void setCorrectLetters(List<PositionLetter> correctLetters) {
-        this.correctLetters = correctLetters;
     }
 
     public List<PositionLetter> getIncorrectLetters() {
@@ -76,5 +67,9 @@ public class GameModel {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public void incrementScore(int amount) {
+        this.score += amount;
     }
 }

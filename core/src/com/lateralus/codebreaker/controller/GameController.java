@@ -36,7 +36,6 @@ public class GameController implements CodeBreakerController {
         this.model = model;
         initializeKeyLetters();
         initializeActiveLetter();
-        model.setCorrectLetters(newArrayList());
         model.setIncorrectLetters(newArrayList());
         initializeInputListener();
     }
@@ -75,9 +74,6 @@ public class GameController implements CodeBreakerController {
         if (model.getIncorrectLetters().stream().anyMatch(positionMatches)) {
             return true;
         }
-        if (model.getCorrectLetters().stream().anyMatch(positionMatches)) {
-            return true;
-        }
 
         return false;
     }
@@ -92,7 +88,7 @@ public class GameController implements CodeBreakerController {
         if (timeSinceLastLetterFall >= LETTER_FALL_SPEED) {
             PositionLetter activeLetter = model.getActiveLetter();
             int currentRow = activeLetter.getRow();
-            if (activeLetterWillHitBottom(currentRow) || activeLetterWillHitOtherLetter()) {
+            if (activeLetterWillHitBottom(currentRow) || activeLetterWillHitIncorrectLetter()) {
                 onActiveLetterHit();
             } else {
                 activeLetter.setRow(currentRow - 1);
@@ -133,15 +129,6 @@ public class GameController implements CodeBreakerController {
         return currentRow <= 1;
     }
 
-    private boolean activeLetterWillHitOtherLetter() {
-        return activeLetterWillHitCorrectLetter() || activeLetterWillHitIncorrectLetter();
-    }
-
-    private boolean activeLetterWillHitCorrectLetter() {
-        return model.getCorrectLetters().stream()
-                .anyMatch((letter) -> activeLetterWillHit(letter));
-    }
-
     private boolean activeLetterWillHitIncorrectLetter() {
         return model.getIncorrectLetters().stream()
                 .anyMatch((letter) -> activeLetterWillHit(letter));
@@ -156,6 +143,7 @@ public class GameController implements CodeBreakerController {
         List<LetterEnum> availableLetters = getAvailableLetters();
 
         if (availableLetters.isEmpty()) {
+            addPointsForCorrectWord();
             initializeKeyLetters();
             availableLetters = getAvailableLetters();
         }
@@ -177,11 +165,26 @@ public class GameController implements CodeBreakerController {
         if (activeLetter.getRow() == getTopRow()) {
             mainController.viewLoseScreen(model.getScore());
         } else if (activeLetter.getValue().equals(keyLetter.getValueLetter()) && keyLetter.isNotSolved()) {
-            keyLetter.setSolved(true);
+            addPointsForCorrectLetter();
+            solveAllRelatedKeyLetters(keyLetter.getValueLetter());
         } else {
             model.getIncorrectLetters().add(activeLetter);
         }
         initializeActiveLetter();
+    }
+
+    private void solveAllRelatedKeyLetters(LetterEnum value) {
+        model.getKeyLetters().stream()
+                .filter(letter -> letter.getValueLetter() == value)
+                .forEach(letter -> letter.setSolved(true));
+    }
+
+    private void addPointsForCorrectLetter() {
+        model.incrementScore(model.getDifficulty().ordinal() * 10 + 10);
+    }
+
+    private void addPointsForCorrectWord() {
+        model.incrementScore(model.getDifficulty().ordinal() * 100 + 100);
     }
 
 }
