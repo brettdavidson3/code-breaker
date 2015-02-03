@@ -3,10 +3,10 @@ package com.lateralus.codebreaker.controller;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.lateralus.codebreaker.controller.input.InputListener;
+import com.lateralus.codebreaker.model.GameModel;
 import com.lateralus.codebreaker.model.letter.KeyLetter;
 import com.lateralus.codebreaker.model.letter.LetterEnum;
 import com.lateralus.codebreaker.model.letter.PositionLetter;
-import com.lateralus.codebreaker.model.GameModel;
 import com.lateralus.codebreaker.util.RandomUtils;
 import com.lateralus.codebreaker.view.render.LetterRenderer;
 
@@ -16,8 +16,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.lateralus.codebreaker.model.GameModel.getTopRow;
 import static com.lateralus.codebreaker.model.letter.LetterEnum.newWord;
-import static com.lateralus.codebreaker.model.GameModel.*;
 import static com.lateralus.codebreaker.util.RandomUtils.getNextValue;
 import static com.lateralus.codebreaker.util.RandomUtils.randomInt;
 
@@ -101,7 +101,7 @@ public class GameController implements CodeBreakerController {
         ArrayList<KeyLetter> keyLetters = newArrayList();
 
         List<LetterEnum> word = initializeWord();
-        int startColumn = randomInt(LetterRenderer.LETTER_COLUMN_COUNT - word.size());
+        int startColumn = getRandomStartColumn(word);
         int columnAfterEnd = startColumn + word.size();
 
         List<LetterEnum> availableKeys = LetterEnum.allLetters();
@@ -119,6 +119,13 @@ public class GameController implements CodeBreakerController {
         }
 
         model.setKeyLetters(keyLetters);
+    }
+
+    private int getRandomStartColumn(List<LetterEnum> word) {
+        if (word.size() == 0) {
+            return 0;
+        }
+        return randomInt(LetterRenderer.LETTER_COLUMN_COUNT - word.size());
     }
 
     private List<LetterEnum> initializeWord() {

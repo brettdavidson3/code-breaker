@@ -14,6 +14,7 @@ import static com.lateralus.codebreaker.view.render.LetterRenderer.LETTER_ROW_CO
 public class GameView implements CodeBreakerView {
 
     public static final List<LetterEnum> WORD_SCORE = newWord("score");
+
     private GameModel model;
 
     public GameView(GameModel model) {
