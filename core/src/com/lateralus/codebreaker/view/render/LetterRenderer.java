@@ -36,9 +36,9 @@ public class LetterRenderer {
         initializeRandomLetters();
     }
 
-    public void reset(float delta) {
+    public void reset(float delta, boolean resetHUD) {
         cycleRandomNumbers(delta);
-        resetSprites();
+        resetSprites(resetHUD);
     }
 
     public void render(SpriteBatch spriteBatch) {
@@ -81,17 +81,29 @@ public class LetterRenderer {
         }
     }
 
-    private void resetSprites() {
+    private void resetSprites(boolean resetHUD) {
         for (int col = 0; col < LETTER_COLUMN_COUNT; col++) {
             useGrayCode();
-            for (int row = 0; row < GAME_AREA_ROW_COUNT; row++) {
-                drawLetter(randomLetters[col][row]);
-            }
+            drawRandomLetters(col, 0, GAME_AREA_ROW_COUNT);
 
-            useWhiteNumbers();
-            for (int row = GAME_AREA_ROW_COUNT; row < LETTER_ROW_COUNT; row++) {
-                drawLetter(col, row, LetterEnum.BLANK);  // TODO - this location may move
+            if (resetHUD) {
+                resetHUD(col);
+            } else {
+                drawRandomLetters(col, GAME_AREA_ROW_COUNT, LETTER_ROW_COUNT);
             }
+        }
+    }
+
+    private void resetHUD(int col) {
+        useWhiteNumbers();
+        for (int row = GAME_AREA_ROW_COUNT; row < LETTER_ROW_COUNT; row++) {
+            drawLetter(col, row, LetterEnum.BLANK);  // TODO - this location may move
+        }
+    }
+
+    private void drawRandomLetters(int col, int startingRow, int endingRow) {
+        for (int row = startingRow; row < endingRow; row++) {
+            drawLetter(randomLetters[col][row]);
         }
     }
 
@@ -182,13 +194,13 @@ public class LetterRenderer {
     }
 
     private void initializeRandomLetters() {
-        randomLetters = new PositionLetter[LETTER_COLUMN_COUNT][GAME_AREA_ROW_COUNT];
+        randomLetters = new PositionLetter[LETTER_COLUMN_COUNT][LETTER_ROW_COUNT];
         randomizeBackgroundLetters();
     }
 
     private void randomizeBackgroundLetters() {
         for (int col = 0; col < LETTER_COLUMN_COUNT; col++) {
-            for (int row = 0; row < GAME_AREA_ROW_COUNT; row++) {
+            for (int row = 0; row < LETTER_ROW_COUNT; row++) {
                 randomLetters[col][row] = new PositionLetter(col, row);
             }
         }

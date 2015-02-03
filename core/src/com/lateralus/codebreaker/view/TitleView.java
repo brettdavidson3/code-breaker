@@ -26,6 +26,11 @@ public class TitleView implements CodeBreakerView {
     }
 
     @Override
+    public void reset(LetterRenderer letterRenderer, float delta) {
+        letterRenderer.reset(delta, false);
+    }
+
+    @Override
     public void render(LetterRenderer letterRenderer) {
         letterRenderer.useGold();
         letterRenderer.drawCenteredWords(15, WORD_CODE, WORD_BREAKER);

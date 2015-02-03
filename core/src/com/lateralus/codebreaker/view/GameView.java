@@ -21,6 +21,11 @@ public class GameView implements CodeBreakerView {
     }
 
     @Override
+    public void reset(LetterRenderer letterRenderer, float delta) {
+        letterRenderer.reset(delta, true);
+    }
+
+    @Override
     public void render(LetterRenderer letterRenderer) {
         renderScore(letterRenderer);
         renderActiveSprite(letterRenderer);

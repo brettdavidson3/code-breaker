@@ -84,7 +84,7 @@ public class MainController implements Screen {
     }
 
     private void applyView(float delta) {
-        letterRenderer.reset(delta);
+        currentScreen.getView().reset(letterRenderer, delta);
         currentScreen.getView().render(letterRenderer);
     }
 
