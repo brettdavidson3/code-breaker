@@ -23,7 +23,7 @@ import static com.lateralus.codebreaker.util.RandomUtils.randomInt;
 
 public class GameController implements CodeBreakerController {
 
-    private static final float LETTER_FALL_SPEED = 0.4f;
+    private static final float LETTER_FALL_INTERVAL = 0.4f;
     private static final float LETTER_FALL_SPEED_MULTIPLIER = 5f;
 
     private MainController mainController;
@@ -41,7 +41,7 @@ public class GameController implements CodeBreakerController {
     }
 
     private void initializeInputListener() {
-        inputListener = new InputListener();
+        inputListener = new InputListener(model.getDifficulty().ordinal());
         inputListener.addHoldListener(Input.Keys.LEFT, this::moveActiveLetterLeft);
         inputListener.addHoldListener(Input.Keys.RIGHT, this::moveActiveLetterRight);
     }
@@ -85,7 +85,7 @@ public class GameController implements CodeBreakerController {
             timeSinceLastLetterFall += delta;
         }
 
-        if (timeSinceLastLetterFall >= LETTER_FALL_SPEED) {
+        if (timeSinceLastLetterFall >= getFallInterval()) {
             PositionLetter activeLetter = model.getActiveLetter();
             int currentRow = activeLetter.getRow();
             if (activeLetterWillHitBottom(currentRow) || activeLetterWillHitIncorrectLetter()) {
@@ -95,6 +95,10 @@ public class GameController implements CodeBreakerController {
             }
             timeSinceLastLetterFall = 0f;
         }
+    }
+
+    private float getFallInterval() {
+        return LETTER_FALL_INTERVAL - (model.getDifficulty().ordinal() * 0.15f);
     }
 
     private void initializeKeyLetters() {
@@ -122,7 +126,7 @@ public class GameController implements CodeBreakerController {
     }
 
     private int getRandomStartColumn(List<LetterEnum> word) {
-        if (word.size() == 0) {
+        if (word.size() == LetterRenderer.LETTER_COLUMN_COUNT) {
             return 0;
         }
         return randomInt(LetterRenderer.LETTER_COLUMN_COUNT - word.size());

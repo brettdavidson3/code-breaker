@@ -10,6 +10,7 @@ public class InputListener {
 
     private static final float KEY_HOLD_INTERVAL = 0.125f;
 
+    private float holdInterval;
     private Map<Integer, Runnable> pressListeners;
     private Map<Integer, Runnable> holdListeners;
     private float timeSinceLastHoldInput = 0f;
@@ -17,6 +18,11 @@ public class InputListener {
     private int currentKeyHeld; // TODO: keep track of more than one key being held
 
     public InputListener() {
+        this(0);
+    }
+
+    public InputListener(float holdIntervalMultiplier) {
+        this.holdInterval = KEY_HOLD_INTERVAL - (0.025f * holdIntervalMultiplier);
         this.pressListeners = newHashMap();
         this.holdListeners = newHashMap();
     }
@@ -66,7 +72,7 @@ public class InputListener {
                 anyKeyPressed = true;
                 if (currentKeyHeld == entry.getKey()) {
                     timeSinceLastHoldInput += delta;
-                    if (timeSinceLastHoldInput >= KEY_HOLD_INTERVAL) {
+                    if (timeSinceLastHoldInput >= holdInterval) {
                         entry.getValue().run();
                         timeSinceLastHoldInput = 0f;
                     }
