@@ -1,11 +1,31 @@
 Code Breaker
 ============
 
-A frantic word completion game!
+A frantic word completion game.
 
 ## Playing the game
 
-Code Breaker is not quite ready for you to play it yet.  Please check back soon for an alpha version of the game!
+Code Breaker prototype is now available.  
+
+### Installation
+
+To play, please make sure you Java 8 installed on your computer, available [here](http://java.com/en/download/).
+
+Next, download the jar file located [here](wat).
+
+Finally, double clicking the jar file will open the game automatically.
+
+### Objective
+
+Try to complete the words at the bottom of the screen with as little guesses as possible. Letters will fall from the top one by one. Control the letters and place them at your best guess for where letters exist in the mystery word.  As you guess correctly the mystery word will become visible.
+
+Once the incorrect guesses stack up and reach the top, you will lose. Try to beat your high score each time you play.
+
+### Controls
+
+On the title screen use the UP and DOWN arrow keys to choose your difficulty, and press ENTER to start the game.
+
+During the game, use the LEFT and RIGHT arrow keys to move the falling letter to the desired position.  You may hold the DOWN arrow key to make the letter fall faster.
 
 ## Development
 
@@ -14,7 +34,7 @@ Currently, **only the Desktop version of the game is supported**.
 
 ### Install Java 8 SE
 
-To begin development you must first install Java 8 SE.  You can download and install it at [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html?ssSourceSiteId=ocomen).
+To begin development you must first install Java 8 SDK.  You can download and install it  [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html?ssSourceSiteId=ocomen).
 
 ### Choose your development environment
 
