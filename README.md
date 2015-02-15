@@ -41,15 +41,14 @@ During the game, use the LEFT and RIGHT arrow keys to move the falling letter to
 Code Breaker is written in Java 8 and relies on the [libgdx framework](https://github.com/libgdx/libgdx).
 Currently, **only the Desktop version of the game is supported**.
 
-### Install Java 8 SE
+### Install Java 8 SDK
 
-To begin development you must first install Java 8 SDK.  You can download and install it  [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html?ssSourceSiteId=ocomen).
+To begin development you must first install the Java 8 SDK.  You can download and install it  [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html?ssSourceSiteId=ocomen).
 
 ### Choose your development environment
 
 Libgdx is designed to work via the command line or in your favorite IDE.  Development in IntelliJ is recommended as
-most work to this date has been done in that environment.  If you choose another development environment you may have to iron
-out some additional configuration details.
+most work to this date has been done in that environment.  If you choose another development environment you may have to iron out some additional configuration details.
 
 #### IntelliJ Setup
 
