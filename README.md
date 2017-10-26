@@ -15,7 +15,7 @@ Next, download the jar file located [here](https://drive.google.com/open?id=0ByS
 
 #### Mac and PC
 
-Finally, double clicking the jar file will open the game automatically.
+Finally, double clicking the jar file will open the game automatically. Note: Depending on your security settings you may need to Right Click -> Open the file instead.
 
 #### Linux
 
