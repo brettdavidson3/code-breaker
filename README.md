@@ -11,7 +11,7 @@ Code Breaker prototype is now available.
 
 To play, please make sure you Java 8 installed on your computer, available [here](http://java.com/en/download/).
 
-Next, download the jar file located [here](https://drive.google.com/file/d/0BySgHim9hPrJbEp0TERDVjZqT0E/view?usp=sharing).
+Next, download the jar file located [here](https://drive.google.com/open?id=0BySgHim9hPrJZ2VFVXhVT0tzX1k).
 
 #### Mac and PC
 
